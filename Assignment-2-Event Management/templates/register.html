@@ -1,0 +1,124 @@
+<!-- ============================================================
+     Project Title : Event Management Website
+     File          : templates/register.html  (Registration Form)
+     ============================================================ -->
+{% extends "base.html" %}
+{% block title %}Register — EventHub{% endblock %}
+
+{% block content %}
+
+<section class="page-header">
+  <h1>Register for an Event</h1>
+  <p>Fill in your details below to secure your spot!</p>
+</section>
+
+<section class="form-section section">
+  <form id="registrationForm" method="POST" action="{{ url_for('register') }}" novalidate>
+    <!-- Full Name -->
+    <div class="form-group">
+      <label for="full_name">Full Name <span class="required">*</span></label>
+      <input type="text" id="full_name" name="full_name" placeholder="Enter your full name" />
+      <span class="error-msg" id="nameError"></span>
+    </div>
+
+    <!-- Email -->
+    <div class="form-group">
+      <label for="email">Email Address <span class="required">*</span></label>
+      <input type="email" id="email" name="email" placeholder="you@example.com" />
+      <span class="error-msg" id="emailError"></span>
+    </div>
+
+    <!-- Phone -->
+    <div class="form-group">
+      <label for="phone">Phone Number <span class="required">*</span></label>
+      <input type="tel" id="phone" name="phone" placeholder="10-digit mobile number" maxlength="10" />
+      <span class="error-msg" id="phoneError"></span>
+    </div>
+
+    <!-- Event Selection -->
+    <div class="form-group">
+      <label for="event_id">Select Event <span class="required">*</span></label>
+      <select id="event_id" name="event_id">
+        <option value="">-- Choose an Event --</option>
+        {% for event in events %}
+          <option value="{{ event['id'] }}"
+            {% if request.args.get('event') == event['id']|string %}selected{% endif %}>
+            {{ event['name'] }}
+          </option>
+        {% endfor %}
+      </select>
+      <span class="error-msg" id="eventError"></span>
+    </div>
+
+    <!-- Number of Tickets -->
+    <div class="form-group">
+      <label for="tickets">Number of Tickets</label>
+      <input type="number" id="tickets" name="tickets" value="1" min="1" max="10" />
+    </div>
+
+    <button type="submit" class="btn btn-primary btn-full" onclick="return validateForm()">
+      🎟️ Confirm Registration
+    </button>
+  </form>
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // ── Client-side Validation (Task 4) ──
+  function validateForm() {
+    let valid = true;
+
+    // Name
+    const name = document.getElementById('full_name').value.trim();
+    const nameErr = document.getElementById('nameError');
+    if (!name) {
+      nameErr.textContent = 'Full name is required.';
+      valid = false;
+    } else {
+      nameErr.textContent = '';
+    }
+
+    // Email
+    const email = document.getElementById('email').value.trim();
+    const emailErr = document.getElementById('emailError');
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email) {
+      emailErr.textContent = 'Email is required.';
+      valid = false;
+    } else if (!emailRegex.test(email)) {
+      emailErr.textContent = 'Enter a valid email address.';
+      valid = false;
+    } else {
+      emailErr.textContent = '';
+    }
+
+    // Phone
+    const phone = document.getElementById('phone').value.trim();
+    const phoneErr = document.getElementById('phoneError');
+    const phoneRegex = /^[6-9]\d{9}$/;
+    if (!phone) {
+      phoneErr.textContent = 'Phone number is required.';
+      valid = false;
+    } else if (!phoneRegex.test(phone)) {
+      phoneErr.textContent = 'Enter a valid 10-digit Indian mobile number.';
+      valid = false;
+    } else {
+      phoneErr.textContent = '';
+    }
+
+    // Event
+    const event = document.getElementById('event_id').value;
+    const eventErr = document.getElementById('eventError');
+    if (!event) {
+      eventErr.textContent = 'Please select an event.';
+      valid = false;
+    } else {
+      eventErr.textContent = '';
+    }
+
+    return valid;
+  }
+</script>
+{% endblock %}

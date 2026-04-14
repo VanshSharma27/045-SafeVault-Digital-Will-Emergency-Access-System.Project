@@ -1,0 +1,61 @@
+<!-- ============================================================
+     Project Title : Event Management Website
+     File          : templates/base.html  (Base Jinja2 Template)
+     Student Name  : ______________________________
+     Roll Number   : ______________________________
+     Date          : ______________________________
+     ============================================================ -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}EventHub{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <!-- ── NAVIGATION ── -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="{{ url_for('index') }}" class="nav-logo">🎪 EventHub</a>
+      <ul class="nav-links">
+        <li><a href="{{ url_for('index') }}"    class="{% if request.endpoint == 'index'    %}active{% endif %}">Home</a></li>
+        <li><a href="{{ url_for('events') }}"   class="{% if request.endpoint == 'events'   %}active{% endif %}">Events</a></li>
+        <li><a href="{{ url_for('register') }}" class="{% if request.endpoint == 'register' %}active{% endif %}">Register</a></li>
+        <li><a href="{{ url_for('admin') }}"    class="{% if request.endpoint == 'admin'    %}active{% endif %}">Admin</a></li>
+      </ul>
+      <button class="nav-toggle" onclick="toggleMenu()">☰</button>
+    </div>
+  </nav>
+
+  <!-- ── FLASH MESSAGES ── -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="flash-container">
+        {% for category, message in messages %}
+          <div class="flash flash-{{ category }}">{{ message }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <!-- ── PAGE CONTENT ── -->
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- ── FOOTER ── -->
+  <footer class="footer">
+    <div class="footer-container">
+      <p>🎪 <strong>EventHub</strong> — Web Development Laboratory | Experiment 4</p>
+      <p>&copy; 2025 EventHub. Built with Flask &amp; ❤️</p>
+    </div>
+  </footer>
+
+  <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>
