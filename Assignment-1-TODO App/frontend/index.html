@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Task Manager</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="logo-box"><i data-lucide="shield-check"></i></div>
+                <span>TaskMaster Pro</span>
+            </div>
+            
+            <div class="nav-group">
+                <p class="nav-label">Main Menu</p>
+                <button class="nav-btn active" onclick="setFilter('all', this)"><i data-lucide="layout"></i> All Tasks</button>
+                <button class="nav-btn" onclick="setFilter('active', this)"><i data-lucide="activity"></i> Pending</button>
+                <button class="nav-btn" onclick="setFilter('completed', this)"><i data-lucide="check-square"></i> Completed</button>
+            </div>
+
+            <div class="extra-actions">
+                <p class="nav-label">Data Management</p>
+                <button class="nav-btn" onclick="exportTasks()"><i data-lucide="download"></i> Export JSON</button>
+            </div>
+
+            <div class="stats-card">
+                <div class="progress-circle-container">
+                    <svg viewBox="0 0 36 36" class="circular-chart">
+                        <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                        <path id="circleFill" class="circle" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                    </svg>
+                    <div class="percentage" id="percentNum">0%</div>
+                </div>
+                <p id="progressLabel">Productivity Score</p>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="header">
+                <div class="search-bar">
+                    <i data-lucide="search"></i>
+                    <input type="text" id="searchInput" placeholder="Search by keyword..." oninput="renderTasks()">
+                </div>
+                <div class="user-profile">
+                    <div class="notif-bell"><i data-lucide="bell" style="width:18px"></i></div>
+                    <div class="avatar">V</div>
+                </div>
+            </header>
+
+            <section class="action-area">
+                <div class="entry-card">
+                    <input type="text" id="taskTitle" placeholder="Task Title" maxlength="50">
+                    <textarea id="taskDesc" placeholder="Describe your objective..."></textarea>
+                    <div class="entry-actions">
+                        <div class="meta-pickers">
+                            <select id="priority">
+                                <option value="Low">Low</option>
+                                <option value="Medium" selected>Medium</option>
+                                <option value="High">High</option>
+                            </select>
+                        </div>
+                        <button class="add-task-btn" onclick="handleAddTask()">Create Task</button>
+                    </div>
+                </div>
+
+                <div class="list-container">
+                    <div class="list-header">
+                        <h3 id="currentView">Task Overview</h3>
+                        <span id="taskCounter">0 Tasks</span>
+                    </div>
+                    <ul id="taskList"></ul>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div id="editModal" class="modal-overlay">
+        <div class="modal-card">
+            <h3>Update Task</h3>
+            <input type="text" id="editTitle">
+            <textarea id="editDesc"></textarea>
+            <select id="editPriority">
+                <option value="Low">Low</option>
+                <option value="Medium">Medium</option>
+                <option value="High">High</option>
+            </select>
+            <div class="modal-footer">
+                <button class="secondary-btn" onclick="closeEditModal()">Cancel</button>
+                <button class="primary-btn" onclick="saveTaskEdit()">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

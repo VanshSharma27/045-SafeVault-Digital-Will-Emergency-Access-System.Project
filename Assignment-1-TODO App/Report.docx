@@ -1,0 +1,37 @@
+Project Report: Dynamic To-Do List Application
+
+Aim: To build a persistent CRUD application using Node.js, SQLite, and Vanilla JS.
+
+1. Database Schema (Table: tasks)
+
+id: INTEGER PRIMARY KEY AUTOINCREMENT
+
+title: TEXT NOT NULL (Validates non-empty & max 50 chars)
+
+description: TEXT
+
+priority: TEXT (Low, Medium, High)
+
+isDone: INTEGER (0 = Active, 1 = Completed)
+
+createdAt: DATETIME DEFAULT CURRENT_TIMESTAMP
+
+2. REST API Endpoints
+
+GET /tasks: Fetch all tasks (Sorted by completion status).
+
+POST /tasks: Create a new task with title, desc, and priority.
+
+PUT /tasks/:id: Full update of task title and priority.
+
+PATCH /tasks/:id/status: Toggle completion (Done/Undone).
+
+DELETE /tasks/:id: Permanent removal from SQLite DB.
+
+3. Challenges Faced
+
+Real-time Sync: Implementing fetch() APIs with async/await to ensure the UI updates immediately without page reloads.
+
+State Management: Handling filters (All/Active/Completed) while keeping the search functionality active at the same time.
+
+UI/UX: Creating a modern "Academic Dashboard" that remains easy to read but includes advanced features like a Productivity Progress Ring.
