@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>SafeVault — Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --void:#05050a;--ink:#0a0a14;--surface:#111120;--lift:#181828;
+  --amber:#d4a017;--ag:#e8c04a;--ad:rgba(212,160,23,.12);--ar:rgba(212,160,23,.22);
+  --text:#f2edd8;--muted:#6b6358;--faint:#222238;
+  --red:#e05252;--green:#4ecb7a;--blue:#4a90e2;--r:12px;
+}
+html,body{height:100%;background:var(--void);color:var(--text);font-family:'Manrope',sans-serif;overflow:hidden}
+.app{display:flex;height:100vh}
+
+/* ── SIDEBAR ── */
+.sb{width:248px;flex-shrink:0;background:var(--ink);border-right:1px solid var(--faint);display:flex;flex-direction:column;padding:18px 10px;overflow:hidden}
+.sb::before{content:'';position:absolute;top:0;left:0;width:248px;height:1px;background:linear-gradient(90deg,transparent,rgba(212,160,23,.3),transparent)}
+.sb-logo{display:flex;align-items:center;gap:10px;padding:8px 10px;margin-bottom:24px}
+.sb-lb{width:34px;height:34px;background:var(--ad);border:1px solid var(--ar);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sb-bn{font-family:'Bebas Neue',sans-serif;font-size:19px;letter-spacing:1px}
+.sb-bn span{color:var(--amber)}
+.ng{font-size:10px;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);padding:0 10px;margin:14px 0 4px}
+.ni{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:9px;cursor:pointer;font-size:13px;color:var(--muted);transition:all .15s;margin-bottom:1px;border:1px solid transparent}
+.ni:hover{background:rgba(255,255,255,.03);color:var(--text)}
+.ni.on{background:var(--ad);color:var(--ag);border-color:var(--ar)}
+.ni svg{width:15px;height:15px;flex-shrink:0}
+.nb{margin-left:auto;font-size:10px;padding:2px 7px;border-radius:8px;background:rgba(255,255,255,.05);color:var(--muted)}
+.ni.on .nb{background:var(--ar);color:var(--amber)}
+
+/* Inactivity Timer in sidebar */
+.sb-timer{
+  margin:12px 0;padding:13px;
+  background:var(--surface);border:1px solid var(--faint);
+  border-radius:var(--r);
+}
+.sb-timer.danger{border-color:rgba(224,82,82,.4);background:rgba(224,82,82,.05)}
+.sb-timer.warning{border-color:rgba(212,160,23,.4);background:rgba(212,160,23,.05)}
+.sb-timer-title{font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.sb-timer-title svg{width:11px;height:11px}
+.timer-digits{display:flex;gap:4px;align-items:center;margin-bottom:6px}
+.td{text-align:center}
+.td-num{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1px;color:var(--amber);line-height:1;padding:4px 6px;background:var(--lift);border-radius:6px;min-width:34px}
+.sb-timer.danger .td-num{color:var(--red)}
+.sb-timer.warning .td-num{color:var(--amber)}
+.td-lbl{font-size:8px;color:var(--muted);margin-top:3px;text-transform:uppercase;letter-spacing:.5px}
+.tsep{font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--muted);margin-bottom:12px}
+.timer-bar-wrap{height:3px;background:rgba(255,255,255,.05);border-radius:2px;overflow:hidden;margin-bottom:5px}
+.timer-bar-fill{height:100%;background:linear-gradient(90deg,var(--green),var(--amber));border-radius:2px;transition:width .5s ease, background .5s}
+.timer-note{font-size:10px;color:var(--muted)}
+
+.sb-store{margin-top:auto;padding:13px;background:var(--surface);border:1px solid var(--faint);border-radius:var(--r)}
+.st-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;font-size:12px}
+.st-l{color:var(--muted)}.st-v{color:var(--amber);font-weight:600}
+.st-bar{height:3px;background:rgba(255,255,255,.05);border-radius:2px;overflow:hidden;margin-bottom:5px}
+.st-fill{height:100%;background:linear-gradient(90deg,var(--amber),var(--ag));border-radius:2px;width:43%}
+.st-n{font-size:11px;color:var(--muted)}
+.sb-user{display:flex;align-items:center;gap:10px;padding:11px 10px;border:1px solid var(--faint);border-radius:10px;margin-top:10px;cursor:pointer;transition:background .15s}
+.sb-user:hover{background:var(--surface)}
+.ava{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--amber),#7a4d0a);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:#0a0700;flex-shrink:0}
+.un{flex:1;min-width:0}
+.unm{font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.url{font-size:11px;color:var(--muted)}
+.logout-btn{background:none;border:none;color:var(--muted);cursor:pointer;padding:4px;display:flex}
+.logout-btn:hover{color:var(--red)}
+.logout-btn svg{width:14px;height:14px}
+
+/* ── MAIN ── */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{display:flex;align-items:center;gap:14px;padding:15px 26px;border-bottom:1px solid var(--faint);background:var(--ink);flex-shrink:0}
+.tbtitle{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:.5px;flex:1}
+.search{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--faint);border-radius:9px;padding:7px 13px;width:250px;transition:border-color .2s}
+.search:focus-within{border-color:var(--ar)}
+.search svg{width:14px;height:14px;color:var(--muted);flex-shrink:0}
+.search input{background:none;border:none;outline:none;color:var(--text);font-family:'Manrope',sans-serif;font-size:13px;flex:1}
+.search input::placeholder{color:var(--muted)}
+.icb{width:35px;height:35px;background:var(--surface);border:1px solid var(--faint);border-radius:9px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted);transition:all .15s;position:relative}
+.icb:hover{border-color:var(--ar);color:var(--amber)}
+.icb svg{width:14px;height:14px}
+.add-btn{display:flex;align-items:center;gap:7px;padding:9px 16px;background:var(--amber);border:none;border-radius:9px;color:#0a0700;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:.5px;cursor:pointer;transition:opacity .15s,transform .1s}
+.add-btn:hover{opacity:.9;transform:translateY(-1px)}
+.add-btn svg{width:14px;height:14px}
+
+/* ── CONTENT ── */
+.content{flex:1;overflow-y:auto;padding:24px}
+.content::-webkit-scrollbar{width:4px}
+.content::-webkit-scrollbar-thumb{background:var(--lift);border-radius:2px}
+
+/* PAGE sections */
+.page{display:none}
+.page.active{display:block}
+
+/* STATS GRID */
+.sg{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
+.sc{background:var(--surface);border:1px solid var(--faint);border-radius:var(--r);padding:17px;transition:border-color .2s;animation:ci .4s ease backwards}
+.sc:hover{border-color:var(--ar)}
+@keyframes ci{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.sc:nth-child(1){animation-delay:.04s}.sc:nth-child(2){animation-delay:.08s}.sc:nth-child(3){animation-delay:.12s}.sc:nth-child(4){animation-delay:.16s}
+.sc-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:13px}
+.sico{width:35px;height:35px;border-radius:9px;display:flex;align-items:center;justify-content:center}
+.sico svg{width:16px;height:16px}
+.ia{background:rgba(212,160,23,.12);color:var(--amber)}.ig{background:rgba(78,203,122,.1);color:var(--green)}.ir{background:rgba(224,82,82,.1);color:var(--red)}.ib{background:rgba(74,144,226,.1);color:var(--blue)}
+.bu{font-size:10px;padding:2px 7px;border-radius:6px;background:rgba(78,203,122,.1);color:var(--green);font-weight:500}
+.bw{font-size:10px;padding:2px 7px;border-radius:6px;background:rgba(224,82,82,.1);color:var(--red);font-weight:500}
+.sv{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:-1px;margin-bottom:3px}
+.sl{font-size:12px;color:var(--muted)}
+
+/* SECTION HEAD */
+.sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.st{font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:.5px;display:flex;align-items:center;gap:9px}
+.cnt{font-size:11px;font-weight:400;background:var(--lift);border:1px solid var(--faint);padding:2px 8px;border-radius:6px;color:var(--muted)}
+.va{font-size:12px;color:var(--amber);background:none;border:none;cursor:pointer;font-family:'Manrope',sans-serif}
+.va:hover{color:var(--ag)}
+
+/* FILTERS */
+.fp{display:flex;gap:7px;margin-bottom:18px;flex-wrap:wrap}
+.fpi{display:flex;align-items:center;gap:6px;padding:6px 12px;border:1px solid var(--faint);border-radius:100px;font-size:12px;color:var(--muted);cursor:pointer;background:none;font-family:'Manrope',sans-serif;transition:all .15s}
+.fpi:hover{border-color:var(--ar);color:var(--text)}
+.fpi.on{background:var(--ad);border-color:var(--ar);color:var(--ag)}
+.fpi svg{width:11px;height:11px}
+
+/* VAULT GRID */
+.vg{display:grid;grid-template-columns:repeat(auto-fill,minmax(268px,1fr));gap:12px;margin-bottom:24px}
+.vc{background:var(--surface);border:1px solid var(--faint);border-radius:var(--r);padding:17px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;animation:ci .4s ease backwards}
+.vc:hover{border-color:var(--ar);transform:translateY(-2px);background:var(--lift)}
+.vc::after{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(212,160,23,.2),transparent);opacity:0;transition:opacity .2s}
+.vc:hover::after{opacity:1}
+.vch{display:flex;align-items:flex-start;gap:11px;margin-bottom:13px}
+.vci{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0}
+.vcm{flex:1;min-width:0}
+.vcn{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px}
+.vct{font-size:11px;color:var(--muted)}
+.vca{display:flex;align-items:center;gap:5px}
+.hd{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.hg{background:var(--green);box-shadow:0 0 5px rgba(78,203,122,.4)}
+.hw{background:var(--amber);box-shadow:0 0 5px rgba(212,160,23,.4)}
+.hb{background:var(--red);box-shadow:0 0 5px rgba(224,82,82,.4)}
+.mb{background:none;border:none;color:var(--muted);cursor:pointer;padding:3px;border-radius:5px;display:flex;transition:all .15s}
+.mb:hover{color:var(--red);background:rgba(224,82,82,.08)}
+.mb svg{width:14px;height:14px}
+.vf{background:var(--lift);border-radius:7px;padding:8px 11px;margin-bottom:7px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.vfl{min-width:0}
+.vfll{font-size:10px;color:var(--muted);margin-bottom:1px;text-transform:uppercase;letter-spacing:.4px}
+.vflv{font-size:12px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vflv.mk{letter-spacing:2px;color:var(--muted)}
+.vflv.wn{color:var(--red)}
+.cb{background:none;border:none;color:var(--muted);cursor:pointer;padding:4px;border-radius:6px;display:flex;flex-shrink:0;transition:all .15s}
+.cb:hover{color:var(--amber);background:var(--ad)}
+.cb svg{width:12px;height:12px}
+.vcf{display:flex;justify-content:space-between;align-items:center;margin-top:11px;padding-top:11px;border-top:1px solid var(--faint)}
+.vtags{display:flex;gap:5px;flex-wrap:wrap}
+.tag{font-size:10px;padding:2px 7px;background:rgba(255,255,255,.03);border:1px solid var(--faint);border-radius:4px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px}
+.vage{font-size:11px;color:var(--muted)}
+.empty{text-align:center;padding:48px 24px;color:var(--muted)}
+.empty svg{width:48px;height:48px;margin:0 auto 16px;opacity:.3;display:block}
+
+/* ── ACTIVITY ── */
+.al{display:flex;flex-direction:column;gap:1px;margin-bottom:24px}
+.ai{display:flex;align-items:center;gap:11px;padding:10px 13px;border-radius:9px;transition:background .15s}
+.ai:hover{background:var(--lift)}
+.aico{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.aico svg{width:13px;height:13px}
+.ag2{background:rgba(78,203,122,.1);color:var(--green)}.aa{background:rgba(212,160,23,.1);color:var(--amber)}.ab{background:rgba(74,144,226,.1);color:var(--blue)}.ar2{background:rgba(224,82,82,.1);color:var(--red)}
+.aii{flex:1;min-width:0}
+.ait{font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ais{font-size:11px;color:var(--muted)}
+.aitm{font-size:11px;color:var(--muted);flex-shrink:0}
+
+/* ── SETTINGS PAGE ── */
+.settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:24px}
+.settings-card{background:var(--surface);border:1px solid var(--faint);border-radius:var(--r);padding:22px;animation:ci .4s ease backwards}
+.settings-card.full{grid-column:1/-1}
+.sc-head{display:flex;align-items:center;gap:10px;margin-bottom:18px}
+.sc-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center}
+.sc-icon svg{width:16px;height:16px}
+.sc-title{font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:.5px}
+.sc-sub{font-size:12px;color:var(--muted);margin-top:2px}
+.sfield{margin-bottom:14px}
+.sfield label{display:block;font-size:10px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.sfield input,.sfield select{width:100%;background:var(--lift);border:1px solid var(--faint);color:var(--text);font-family:'Manrope',sans-serif;font-size:13px;padding:10px 13px;border-radius:9px;outline:none;transition:border-color .2s}
+.sfield input:focus,.sfield select:focus{border-color:var(--amber)}
+.sfield input::placeholder{color:var(--muted)}
+.sfield .hint{font-size:11px;color:var(--muted);margin-top:5px;line-height:1.5}
+.save-btn{padding:10px 22px;background:var(--amber);border:none;border-radius:9px;color:#0a0700;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:.5px;cursor:pointer;transition:opacity .15s;display:flex;align-items:center;gap:8px}
+.save-btn:hover{opacity:.9}
+.save-btn .spin{display:none;width:14px;height:14px;border:2px solid rgba(10,7,0,.3);border-top-color:#0a0700;border-radius:50%;animation:spin .6s linear infinite}
+.save-btn.loading .spin{display:block}
+.save-btn.loading .stxt{display:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Emergency contact status */
+.ec-status{display:flex;align-items:center;gap:8px;padding:10px 13px;border-radius:9px;margin-top:10px;font-size:12px}
+.ec-set{background:rgba(78,203,122,.08);border:1px solid rgba(78,203,122,.2);color:var(--green)}
+.ec-unset{background:rgba(224,82,82,.08);border:1px solid rgba(224,82,82,.2);color:var(--red)}
+.ec-status svg{width:13px;height:13px;flex-shrink:0}
+
+/* Info list */
+.info-list{display:flex;flex-direction:column;gap:8px}
+.info-row{display:flex;justify-content:space-between;align-items:center;padding:9px 12px;background:var(--lift);border-radius:8px}
+.info-key{font-size:12px;color:var(--muted)}
+.info-val{font-size:12px;color:var(--text);font-weight:500}
+
+/* Danger zone */
+.danger-zone{background:rgba(224,82,82,.05);border:1px solid rgba(224,82,82,.2);border-radius:var(--r);padding:18px;margin-top:0}
+.danger-title{font-family:'Bebas Neue',sans-serif;font-size:15px;color:var(--red);letter-spacing:.5px;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.danger-title svg{width:15px;height:15px}
+.danger-sub{font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.6}
+.danger-btn{padding:9px 18px;background:none;border:1px solid rgba(224,82,82,.4);border-radius:9px;color:var(--red);font-family:'Manrope',sans-serif;font-size:13px;cursor:pointer;transition:all .15s}
+.danger-btn:hover{background:rgba(224,82,82,.08)}
+
+/* ── MODAL: Add Item ── */
+.modal-bg{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.8);backdrop-filter:blur(4px);align-items:center;justify-content:center}
+.modal-bg.open{display:flex}
+.modal{background:var(--surface);border:1px solid var(--ar);border-radius:18px;padding:28px;width:460px;max-width:95vw;animation:mi .25s cubic-bezier(.34,1.56,.64,1)}
+@keyframes mi{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:scale(1)}}
+.mh{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px}
+.mt{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.5px}
+.mc{background:none;border:none;color:var(--muted);cursor:pointer;padding:5px;border-radius:7px;transition:all .15s;display:flex}
+.mc:hover{color:var(--text);background:var(--lift)}
+.mc svg{width:17px;height:17px}
+.tg{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:22px}
+.to{padding:13px 7px;border:1px solid var(--faint);border-radius:10px;text-align:center;cursor:pointer;transition:all .15s}
+.to:hover{border-color:var(--ar);background:var(--ad)}
+.to.sel{border-color:var(--amber);background:var(--ad)}
+.te{font-size:22px;margin-bottom:4px}
+.tn{font-size:11px;color:var(--muted)}
+.to.sel .tn{color:var(--ag)}
+.mf{margin-bottom:13px}
+.mf label{display:block;font-size:10px;font-weight:600;letter-spacing:.7px;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
+.mf input{width:100%;background:var(--lift);border:1px solid var(--faint);color:var(--text);font-family:'Manrope',sans-serif;font-size:13px;padding:10px 12px;border-radius:9px;outline:none;transition:border-color .2s}
+.mf input:focus{border-color:var(--amber)}
+.mf input::placeholder{color:var(--muted)}
+.mbtns{display:flex;gap:9px;margin-top:20px}
+.btnc{flex:1;padding:11px;background:var(--lift);border:1px solid var(--faint);border-radius:9px;color:var(--muted);font-family:'Manrope',sans-serif;font-size:13px;cursor:pointer;transition:all .15s}
+.btnc:hover{border-color:var(--ar);color:var(--text)}
+.btns{flex:2;padding:11px;background:var(--amber);border:none;border-radius:9px;color:#0a0700;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:.5px;cursor:pointer;transition:opacity .15s;display:flex;align-items:center;justify-content:center;gap:8px}
+.btns:hover{opacity:.9}
+.btns .spin2{display:none;width:16px;height:16px;border:2px solid rgba(10,7,0,.3);border-top-color:#0a0700;border-radius:50%;animation:spin .6s linear infinite}
+.btns.loading .spin2{display:block}
+.btns.loading .st2{display:none}
+
+/* LOADING */
+.lo{display:none;position:fixed;inset:0;background:rgba(5,5,10,.85);z-index:999;align-items:center;justify-content:center;flex-direction:column;gap:12px}
+.lo.show{display:flex}
+.lspin{width:38px;height:38px;border:3px solid rgba(212,160,23,.2);border-top-color:var(--amber);border-radius:50%;animation:spin .8s linear infinite}
+.ltxt{font-size:14px;color:var(--muted)}
+
+/* TOAST */
+.toast{position:fixed;bottom:22px;right:22px;z-index:9999;background:var(--lift);border:1px solid var(--ar);padding:12px 18px;border-radius:10px;font-size:13px;color:var(--text);display:flex;align-items:center;gap:9px;pointer-events:none;transform:translateY(60px);opacity:0;transition:all .35s cubic-bezier(.34,1.56,.64,1);max-width:320px}
+.toast.show{transform:translateY(0);opacity:1}
+.toast svg{width:13px;height:13px;color:var(--amber);flex-shrink:0}
+.toast.err svg{color:var(--red)}
+.toast.err{border-color:rgba(224,82,82,.3)}
+</style>
+</head>
+<body>
+<div class="lo" id="lo"><div class="lspin"></div><div class="ltxt">Loading vault…</div></div>
+
+<div class="app">
+
+<!-- ── SIDEBAR ── -->
+<nav class="sb">
+  <div class="sb-logo">
+    <div class="sb-lb">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#d4a017" stroke-width="1.6">
+        <rect x="3" y="6" width="18" height="15" rx="2.5"/>
+        <circle cx="12" cy="13.5" r="2.5"/>
+        <path d="M15 7V5a3 3 0 0 0-6 0v2"/>
+        <circle cx="12" cy="13.5" r="1" fill="#d4a017"/>
+      </svg>
+    </div>
+    <span class="sb-bn">Safe<span>Vault</span></span>
+  </div>
+
+  <div class="ng">Main</div>
+  <div class="ni on" onclick="goPage('dashboard',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+    Dashboard <span class="nb" id="nb-all">—</span>
+  </div>
+  <div class="ni" onclick="goPage('passwords',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/><circle cx="12" cy="16" r="1.5" fill="currentColor"/></svg>
+    Passwords <span class="nb" id="nb-password">—</span>
+  </div>
+  <div class="ni" onclick="goPage('cards',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="1" y="4" width="22" height="16" rx="2.5"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+    Cards <span class="nb" id="nb-card">—</span>
+  </div>
+  <div class="ni" onclick="goPage('documents',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+    Documents <span class="nb" id="nb-document">—</span>
+  </div>
+  <div class="ni" onclick="goPage('notes',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+    Notes <span class="nb" id="nb-note">—</span>
+  </div>
+
+  <div class="ng">Account</div>
+  <div class="ni" onclick="goPage('settings',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    Settings
+  </div>
+
+  <!-- ── INACTIVITY TIMER ── -->
+  <div class="sb-timer" id="sb-timer">
+    <div class="sb-timer-title">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      Inactivity Timer
+    </div>
+    <div class="timer-digits">
+      <div class="td"><div class="td-num" id="t-days">00</div><div class="td-lbl">Days</div></div>
+      <div class="tsep">:</div>
+      <div class="td"><div class="td-num" id="t-hours">00</div><div class="td-lbl">Hrs</div></div>
+      <div class="tsep">:</div>
+      <div class="td"><div class="td-num" id="t-mins">00</div><div class="td-lbl">Min</div></div>
+      <div class="tsep">:</div>
+      <div class="td"><div class="td-num" id="t-secs">00</div><div class="td-lbl">Sec</div></div>
+    </div>
+    <div class="timer-bar-wrap"><div class="timer-bar-fill" id="timer-bar" style="width:100%"></div></div>
+    <div class="timer-note" id="timer-note">Since last login</div>
+  </div>
+
+  <div class="sb-store">
+    <div class="st-top"><span class="st-l">Vault Storage</span><span class="st-v" id="storage-pct">0%</span></div>
+    <div class="st-bar"><div class="st-fill" id="storage-bar" style="width:0%"></div></div>
+    <div class="st-n" id="storage-note">— items stored</div>
+  </div>
+
+  <div class="sb-user">
+    <div class="ava" id="user-ava">JD</div>
+    <div class="un">
+      <div class="unm" id="user-name">Loading…</div>
+      <div class="url">SafeVault Pro</div>
+    </div>
+    <button class="logout-btn" onclick="logout()" title="Logout">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+    </button>
+  </div>
+</nav>
+
+<!-- ── MAIN ── -->
+<div class="main">
+  <div class="topbar">
+    <div class="tbtitle" id="page-title">Dashboard</div>
+    <div class="search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" placeholder="Search vault items…" id="search-inp" oninput="filterVault(this.value)">
+    </div>
+    <div class="icb" title="Lock Vault" onclick="lockVault()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+    </div>
+    <button class="add-btn" onclick="openModal()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#0a0700" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      ADD ITEM
+    </button>
+  </div>
+
+  <div class="content">
+
+    <!-- ══ PAGE: DASHBOARD ══ -->
+    <div class="page active" id="page-dashboard">
+      <div class="sg">
+        <div class="sc">
+          <div class="sc-top"><div class="sico ia"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/><circle cx="12" cy="16" r="1.5" fill="currentColor"/></svg></div><span class="bu" id="st-badge">—</span></div>
+          <div class="sv" id="st-total">—</div><div class="sl">Total vault items</div>
+        </div>
+        <div class="sc">
+          <div class="sc-top"><div class="sico ig"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg></div><span class="bu">Protected</span></div>
+          <div class="sv" style="color:var(--green)" id="st-pass">—</div><div class="sl">Passwords stored</div>
+        </div>
+        <div class="sc">
+          <div class="sc-top"><div class="sico ir"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div><span class="bw" id="st-weak-badge">—</span></div>
+          <div class="sv" style="color:var(--red)" id="st-weak">—</div><div class="sl">Weak passwords</div>
+        </div>
+        <div class="sc">
+          <div class="sc-top"><div class="sico ib"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div><span class="bu">Encrypted</span></div>
+          <div class="sv" id="st-cards">—</div><div class="sl">Cards stored</div>
+        </div>
+      </div>
+
+      <div class="sh">
+        <div class="st">All Vault Items <span class="cnt" id="item-count">—</span></div>
+        <button class="va" onclick="loadVault()">Refresh ↺</button>
+      </div>
+      <div class="fp">
+        <button class="fpi on" onclick="filterType('all',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>All</button>
+        <button class="fpi" onclick="filterType('password',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>Passwords</button>
+        <button class="fpi" onclick="filterType('card',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Cards</button>
+        <button class="fpi" onclick="filterType('document',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Documents</button>
+        <button class="fpi" onclick="filterType('note',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Notes</button>
+      </div>
+      <div class="vg" id="vault-grid"></div>
+
+      <div class="sh"><div class="st">Recent Activity</div></div>
+      <div class="al" id="activity-list">
+        <div class="ai"><div class="aico ag2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/><circle cx="12" cy="16" r="1.5" fill="currentColor"/></svg></div><div class="aii"><div class="ait">Vault session started</div><div class="ais">Authenticated via JWT</div></div><div class="aitm">Just now</div></div>
+      </div>
+    </div>
+
+    <!-- ══ PAGE: PASSWORDS ══ -->
+    <div class="page" id="page-passwords">
+      <div class="sh"><div class="st">Passwords <span class="cnt" id="pw-count">—</span></div><button class="va" onclick="openModal()">+ Add Password</button></div>
+      <div class="vg" id="pw-grid"></div>
+    </div>
+
+    <!-- ══ PAGE: CARDS ══ -->
+    <div class="page" id="page-cards">
+      <div class="sh"><div class="st">Payment Cards <span class="cnt" id="card-count">—</span></div><button class="va" onclick="openModal()">+ Add Card</button></div>
+      <div class="vg" id="card-grid"></div>
+    </div>
+
+    <!-- ══ PAGE: DOCUMENTS ══ -->
+    <div class="page" id="page-documents">
+      <div class="sh"><div class="st">Documents <span class="cnt" id="doc-count">—</span></div><button class="va" onclick="openModal()">+ Add Document</button></div>
+      <div class="vg" id="doc-grid"></div>
+    </div>
+
+    <!-- ══ PAGE: NOTES ══ -->
+    <div class="page" id="page-notes">
+      <div class="sh"><div class="st">Secure Notes <span class="cnt" id="note-count">—</span></div><button class="va" onclick="openModal()">+ Add Note</button></div>
+      <div class="vg" id="note-grid"></div>
+    </div>
+
+    <!-- ══ PAGE: SETTINGS ══ -->
+    <div class="page" id="page-settings">
+      <div class="settings-grid">
+
+        <!-- Emergency Contact Card -->
+        <div class="settings-card">
+          <div class="sc-head">
+            <div class="sc-icon" style="background:rgba(224,82,82,.1);color:var(--red)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9.91a16 16 0 0 0 6 6l.92-.92a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 17.18z"/></svg>
+            </div>
+            <div>
+              <div class="sc-title">Emergency Contact</div>
+              <div class="sc-sub">Alert this email if you're inactive 30+ days</div>
+            </div>
+          </div>
+          <div class="sfield">
+            <label>Emergency Contact Email</label>
+            <input type="email" id="ec-email" placeholder="family@example.com or friend@example.com">
+            <div class="hint">🔔 If you don't log in for <strong>30 days</strong>, SafeVault will automatically send an alert to this person.</div>
+          </div>
+          <div id="ec-status-box"></div>
+          <br>
+          <button class="save-btn" onclick="saveEmergencyContact(this)">
+            <div class="spin"></div>
+            <span class="stxt">💾 SAVE CONTACT</span>
+          </button>
+        </div>
+
+        <!-- Profile Card -->
+        <div class="settings-card">
+          <div class="sc-head">
+            <div class="sc-icon" style="background:rgba(212,160,23,.12);color:var(--amber)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+            </div>
+            <div>
+              <div class="sc-title">Your Profile</div>
+              <div class="sc-sub">Update your display name</div>
+            </div>
+          </div>
+          <div class="sfield">
+            <label>Display Name</label>
+            <input type="text" id="profile-name" placeholder="Your full name">
+          </div>
+          <div class="sfield">
+            <label>Email Address</label>
+            <input type="email" id="profile-email" placeholder="your@email.com" disabled style="opacity:.5;cursor:not-allowed">
+            <div class="hint">Email cannot be changed after registration.</div>
+          </div>
+          <br>
+          <button class="save-btn" onclick="saveProfile(this)">
+            <div class="spin"></div>
+            <span class="stxt">💾 SAVE PROFILE</span>
+          </button>
+        </div>
+
+        <!-- Account Info -->
+        <div class="settings-card">
+          <div class="sc-head">
+            <div class="sc-icon" style="background:rgba(74,144,226,.1);color:var(--blue)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            </div>
+            <div>
+              <div class="sc-title">Account Info</div>
+              <div class="sc-sub">Your vault details</div>
+            </div>
+          </div>
+          <div class="info-list">
+            <div class="info-row"><span class="info-key">Account</span><span class="info-val" id="info-email">—</span></div>
+            <div class="info-row"><span class="info-key">Last Login</span><span class="info-val" id="info-last">—</span></div>
+            <div class="info-row"><span class="info-key">Total Items</span><span class="info-val" id="info-items">—</span></div>
+            <div class="info-row"><span class="info-key">Encryption</span><span class="info-val" style="color:var(--green)">AES-256-CBC ✓</span></div>
+            <div class="info-row"><span class="info-key">Auth</span><span class="info-val" style="color:var(--green)">JWT + bcrypt ✓</span></div>
+          </div>
+        </div>
+
+        <!-- Inactivity Timer Info -->
+        <div class="settings-card">
+          <div class="sc-head">
+            <div class="sc-icon" style="background:rgba(78,203,122,.1);color:var(--green)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+            <div>
+              <div class="sc-title">Inactivity Timer</div>
+              <div class="sc-sub">How it works</div>
+            </div>
+          </div>
+          <div class="info-list">
+            <div class="info-row"><span class="info-key">Timer resets on</span><span class="info-val">Every login</span></div>
+            <div class="info-row"><span class="info-key">Alert sent after</span><span class="info-val">30 days</span></div>
+            <div class="info-row"><span class="info-key">Alert sent to</span><span class="info-val" id="info-ec">Not set</span></div>
+            <div class="info-row"><span class="info-key">Cron schedule</span><span class="info-val">Daily 9:00 AM</span></div>
+            <div class="info-row"><span class="info-key">Alert sent once</span><span class="info-val" style="color:var(--green)">Yes (no spam) ✓</span></div>
+          </div>
+        </div>
+
+        <!-- Danger Zone -->
+        <div class="settings-card full">
+          <div class="danger-zone">
+            <div class="danger-title">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/></svg>
+              Danger Zone
+            </div>
+            <div class="danger-sub">These actions are irreversible. Be absolutely sure before proceeding.</div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap">
+              <button class="danger-btn" onclick="if(confirm('Clear all vault items? This cannot be undone!')) showToast('Feature coming soon','err')">🗑 Clear All Vault Items</button>
+              <button class="danger-btn" onclick="if(confirm('Delete account permanently?')) showToast('Feature coming soon','err')">💀 Delete Account</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+</div><!-- /app -->
+
+<!-- ── MODAL: Add Item ── -->
+<div class="modal-bg" id="modal" onclick="closeModalBg(event)">
+  <div class="modal">
+    <div class="mh">
+      <div class="mt">Add Vault Item</div>
+      <button class="mc" onclick="closeModal()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="tg">
+      <div class="to sel" onclick="selType(this,'password')"><div class="te">🔑</div><div class="tn">Password</div></div>
+      <div class="to" onclick="selType(this,'card')"><div class="te">💳</div><div class="tn">Card</div></div>
+      <div class="to" onclick="selType(this,'document')"><div class="te">📄</div><div class="tn">Document</div></div>
+      <div class="to" onclick="selType(this,'note')"><div class="te">📝</div><div class="tn">Note</div></div>
+      <div class="to" onclick="selType(this,'identity')"><div class="te">🛂</div><div class="tn">Identity</div></div>
+      <div class="to" onclick="selType(this,'apikey')"><div class="te">🔗</div><div class="tn">API Key</div></div>
+    </div>
+    <div class="mf"><label>Item name *</label><input type="text" placeholder="e.g. My Gmail Account" id="m-name"></div>
+    <div class="mf"><label>Username / Email</label><input type="text" placeholder="username or email" id="m-user"></div>
+    <div class="mf"><label>Password / Secret *</label><input type="password" placeholder="Secret to encrypt" id="m-secret"></div>
+    <div class="mf"><label>Tags (comma separated)</label><input type="text" placeholder="work, personal" id="m-tags"></div>
+    <input type="hidden" id="m-type" value="password">
+    <div class="mbtns">
+      <button class="btnc" onclick="closeModal()">Cancel</button>
+      <button class="btns" onclick="saveItem(this)">
+        <div class="spin2"></div>
+        <span class="st2">ENCRYPT & SAVE 🔒</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+  <span id="tmsg"></span>
+</div>
+
+<script>
+const API = '/api';
+let allItems = [];
+let currentFilter = 'all';
+let timerInterval = null;
+
+// ── AUTH CHECK ──
+const token = localStorage.getItem('sv_token');
+if (!token) window.location.href = 'index.html';
+const userData = JSON.parse(localStorage.getItem('sv_user') || '{}');
+
+// ── INIT UI ──
+if (userData.name) {
+  document.getElementById('user-name').textContent = userData.name;
+  const init = userData.name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+  document.getElementById('user-ava').textContent = init;
+}
+if (userData.email) {
+  document.getElementById('profile-name').value = userData.name || '';
+  document.getElementById('profile-email').value = userData.email;
+  document.getElementById('info-email').textContent = userData.email;
+  document.getElementById('info-last').textContent = userData.lastActive ? new Date(userData.lastActive).toLocaleString('en-IN') : '—';
+}
+if (userData.emergencyContact) {
+  document.getElementById('ec-email').value = userData.emergencyContact;
+  document.getElementById('info-ec').textContent = userData.emergencyContact;
+  showEcStatus(userData.emergencyContact);
+}
+
+// ── INACTIVITY STOPWATCH ──
+function startTimer() {
+  if (timerInterval) clearInterval(timerInterval);
+  const lastLogin = userData.lastActive ? new Date(userData.lastActive).getTime() : Date.now();
+  const LIMIT = 30 * 24 * 60 * 60 * 1000; // 30 days in ms
+
+  function tick() {
+    const elapsed = Date.now() - lastLogin;
+    const remaining = LIMIT - elapsed;
+    const timerEl = document.getElementById('sb-timer');
+
+    // Show elapsed time (how long since last login)
+    const totalSec = Math.floor(elapsed / 1000);
+    const d = Math.floor(totalSec / 86400);
+    const h = Math.floor((totalSec % 86400) / 3600);
+    const m = Math.floor((totalSec % 3600) / 60);
+    const s = totalSec % 60;
+
+    document.getElementById('t-days').textContent  = String(d).padStart(2,'0');
+    document.getElementById('t-hours').textContent = String(h).padStart(2,'0');
+    document.getElementById('t-mins').textContent  = String(m).padStart(2,'0');
+    document.getElementById('t-secs').textContent  = String(s).padStart(2,'0');
+
+    // Progress bar: full = just logged in, empty = 30 days passed
+    const pct = Math.max(0, Math.min(100, (remaining / LIMIT) * 100));
+    const bar = document.getElementById('timer-bar');
+    bar.style.width = pct + '%';
+
+    // Color coding
+    timerEl.classList.remove('danger','warning');
+    if (pct <= 10) {
+      timerEl.classList.add('danger');
+      bar.style.background = 'var(--red)';
+      document.getElementById('timer-note').textContent = '⚠ Alert will be sent soon!';
+    } else if (pct <= 30) {
+      timerEl.classList.add('warning');
+      bar.style.background = 'linear-gradient(90deg,var(--amber),var(--ag))';
+      const dLeft = Math.ceil(remaining / 86400000);
+      document.getElementById('timer-note').textContent = `${dLeft} days until alert`;
+    } else {
+      bar.style.background = 'linear-gradient(90deg,var(--green),var(--amber))';
+      document.getElementById('timer-note').textContent = 'Since last login · resets on login';
+    }
+  }
+
+  tick();
+  timerInterval = setInterval(tick, 1000);
+}
+
+startTimer();
+
+// ── HELPERS ──
+function showToast(msg, type='ok', dur=2800) {
+  const t = document.getElementById('toast');
+  document.getElementById('tmsg').textContent = msg;
+  t.classList.toggle('err', type === 'err');
+  t.classList.add('show');
+  clearTimeout(t._t);
+  t._t = setTimeout(() => t.classList.remove('show'), dur);
+}
+
+function copyVal(val, btn) {
+  navigator.clipboard.writeText(val).catch(() => {});
+  const old = btn.innerHTML;
+  btn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>';
+  btn.style.color = 'var(--green)';
+  setTimeout(() => { btn.innerHTML = old; btn.style.color = ''; }, 1400);
+  showToast('Copied to clipboard!');
+}
+
+function timeAgo(d) {
+  const diff = Date.now() - new Date(d).getTime();
+  const m = Math.floor(diff/60000), h = Math.floor(diff/3600000), day = Math.floor(diff/86400000);
+  if (m < 1) return 'just now';
+  if (m < 60) return m + 'm ago';
+  if (h < 24) return h + 'h ago';
+  return day + 'd ago';
+}
+
+const typeEmoji = {password:'🔑',card:'💳',document:'📄',note:'📝',identity:'🛂',apikey:'🔗'};
+const typeLabel = {password:'Password',card:'Card',document:'Document',note:'Note',identity:'Identity',apikey:'API Key'};
+const typeBg    = {password:'rgba(212,160,23,.08)',card:'rgba(74,144,226,.08)',document:'rgba(139,92,246,.08)',note:'rgba(212,160,23,.08)',identity:'rgba(78,203,122,.08)',apikey:'rgba(224,82,82,.08)'};
+
+function cardHTML(item, i) {
+  const isWeak = item.type==='password' && item.secret && item.secret.length < 8 && !item.secret.includes('•');
+  const health = isWeak ? 'hb' : item.type==='card' ? 'hw' : 'hg';
+  const secretDisp = (item.type==='password'||item.type==='note'||item.type==='apikey') ? '••••••••••••' : (item.secret||'—');
+  const masked = secretDisp.includes('•');
+  return `
+    <div class="vc" data-type="${item.type}" data-name="${item.name.toLowerCase()}" style="animation-delay:${i*.04}s">
+      <div class="vch">
+        <div class="vci" style="background:${typeBg[item.type]||'rgba(255,255,255,.04)'}">${typeEmoji[item.type]||'📦'}</div>
+        <div class="vcm"><div class="vcn">${item.name}</div><div class="vct">${typeEmoji[item.type]} ${typeLabel[item.type]}</div></div>
+        <div class="vca">
+          <div class="hd ${health}"></div>
+          <button class="mb" onclick="deleteItem('${item._id}',this)" title="Delete">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg>
+          </button>
+        </div>
+      </div>
+      ${item.username ? `<div class="vf"><div class="vfl"><div class="vfll">Username</div><div class="vflv">${item.username}</div></div><button class="cb" onclick="copyVal('${item.username}',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></div>` : ''}
+      <div class="vf">
+        <div class="vfl">
+          <div class="vfll">${item.type==='card'?'Card Info':'Secret'}</div>
+          <div class="vflv ${masked?'mk':''} ${isWeak?'wn':''}">${isWeak?'⚠ Weak — update now':secretDisp}</div>
+        </div>
+        <button class="cb" onclick="copyVal('${item.secret||''}',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
+      </div>
+      <div class="vcf">
+        <div class="vtags">${(item.tags||[]).map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+        <span class="vage">${timeAgo(item.updatedAt||item.createdAt)}</span>
+      </div>
+    </div>`;
+}
+
+function emptyState(msg) {
+  return `<div class="empty" style="grid-column:1/-1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg><p>${msg}</p></div>`;
+}
+
+// ── VAULT LOAD & RENDER ──
+async function loadVault() {
+  document.getElementById('lo').classList.add('show');
+  try {
+    const res = await fetch(`${API}/vault`, { headers: { Authorization: `Bearer ${token}` } });
+    if (res.status === 401) { logout(); return; }
+    allItems = await res.json();
+  } catch {
+    allItems = getDemoItems();
+    showToast('Demo mode — server offline', 'err');
+  } finally {
+    document.getElementById('lo').classList.remove('show');
+  }
+  renderAll();
+}
+
+function getDemoItems() {
+  return [
+    {_id:'1',type:'password',name:'GitHub',username:'john@email.com',secret:'Gh!secure2024#',tags:['dev'],updatedAt:new Date(Date.now()-3*86400000)},
+    {_id:'2',type:'card',name:'Visa Debit',username:'',secret:'4521',tags:['finance'],updatedAt:new Date(Date.now()-30*86400000)},
+    {_id:'3',type:'document',name:'Passport',username:'P123456789',secret:'P123456789',tags:['identity'],updatedAt:new Date(Date.now()-14*86400000)},
+    {_id:'4',type:'password',name:'Netflix',username:'john@email.com',secret:'abc',tags:['entertainment'],updatedAt:new Date(Date.now()-150*86400000)},
+    {_id:'5',type:'note',name:'SSH Keys',username:'',secret:'ssh-rsa AAAA...',tags:['dev','server'],updatedAt:new Date(Date.now()-7*86400000)},
+    {_id:'6',type:'password',name:'AWS Console',username:'123456789012',secret:'Aws!prod#2024',tags:['cloud'],updatedAt:new Date(Date.now()-2*86400000)},
+  ];
+}
+
+function renderAll() {
+  const q = document.getElementById('search-inp').value.toLowerCase();
+  const filtered = q ? allItems.filter(i => i.name.toLowerCase().includes(q)) : allItems;
+
+  // Update stats
+  const total = filtered.length;
+  const passwords = filtered.filter(i=>i.type==='password');
+  const weak = passwords.filter(i=>i.secret && i.secret.length<8 && !i.secret.includes('•')).length;
+  const cards = filtered.filter(i=>i.type==='card').length;
+
+  document.getElementById('st-total').textContent = total;
+  document.getElementById('st-badge').textContent = total + ' items';
+  document.getElementById('st-pass').textContent = passwords.length;
+  document.getElementById('st-weak').textContent = weak;
+  document.getElementById('st-weak-badge').textContent = weak > 0 ? 'Fix now' : 'Clean';
+  document.getElementById('st-cards').textContent = cards;
+  document.getElementById('info-items').textContent = total;
+
+  // Storage
+  const pct = Math.min(100, Math.round(total * 3.5));
+  document.getElementById('storage-pct').textContent = pct + '%';
+  document.getElementById('storage-bar').style.width = pct + '%';
+  document.getElementById('storage-note').textContent = total + ' items stored';
+
+  // Nav badges
+  ['password','card','document','note'].forEach(t => {
+    const el = document.getElementById('nb-' + t);
+    if (el) el.textContent = allItems.filter(i=>i.type===t).length;
+  });
+  document.getElementById('nb-all').textContent = allItems.length;
+
+  // Dashboard grid (filter type)
+  const visible = currentFilter==='all' ? filtered : filtered.filter(i=>i.type===currentFilter);
+  document.getElementById('item-count').textContent = visible.length + ' items';
+  const grid = document.getElementById('vault-grid');
+  grid.innerHTML = visible.length ? visible.map(cardHTML).join('') : emptyState('No items found');
+
+  // Type-specific pages
+  const types = {passwords:'password', cards:'card', documents:'document', notes:'note'};
+  for (const [page, type] of Object.entries(types)) {
+    const g = document.getElementById(page.slice(0,-1)+'-grid') || document.getElementById(page.replace('s','')+'-grid');
+    const items = allItems.filter(i=>i.type===type);
+    const cntEl = document.getElementById(page.slice(0,-1)+'-count') || document.getElementById(page.replace('s','')+'-count');
+    if (g) g.innerHTML = items.length ? items.map(cardHTML).join('') : emptyState('No ' + page + ' yet — add some!');
+    if (cntEl) cntEl.textContent = items.length + ' items';
+  }
+  // fix for pw-grid id
+  const pwGrid = document.getElementById('pw-grid');
+  if (pwGrid) {
+    const pws = allItems.filter(i=>i.type==='password');
+    pwGrid.innerHTML = pws.length ? pws.map(cardHTML).join('') : emptyState('No passwords yet');
+    document.getElementById('pw-count').textContent = pws.length + ' items';
+  }
+  const cardGrid = document.getElementById('card-grid');
+  if (cardGrid) {
+    const cs = allItems.filter(i=>i.type==='card');
+    cardGrid.innerHTML = cs.length ? cs.map(cardHTML).join('') : emptyState('No cards yet');
+    document.getElementById('card-count').textContent = cs.length + ' items';
+  }
+  const docGrid = document.getElementById('doc-grid');
+  if (docGrid) {
+    const ds = allItems.filter(i=>i.type==='document');
+    docGrid.innerHTML = ds.length ? ds.map(cardHTML).join('') : emptyState('No documents yet');
+    document.getElementById('doc-count').textContent = ds.length + ' items';
+  }
+  const noteGrid = document.getElementById('note-grid');
+  if (noteGrid) {
+    const ns = allItems.filter(i=>i.type==='note');
+    noteGrid.innerHTML = ns.length ? ns.map(cardHTML).join('') : emptyState('No notes yet');
+    document.getElementById('note-count').textContent = ns.length + ' items';
+  }
+}
+
+function filterVault(q) { renderAll(); }
+
+function filterType(type, btn) {
+  currentFilter = type;
+  document.querySelectorAll('.fpi').forEach(p=>p.classList.remove('on'));
+  btn.classList.add('on');
+  renderAll();
+}
+
+// ── NAVIGATION ──
+function goPage(name, el) {
+  document.querySelectorAll('.ni').forEach(n=>n.classList.remove('on'));
+  el.classList.add('on');
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  const titles = {dashboard:'Dashboard',passwords:'Passwords',cards:'Payment Cards',documents:'Documents',notes:'Secure Notes',settings:'Settings'};
+  document.getElementById('page-title').textContent = titles[name] || name;
+  if (name === 'settings') loadSettingsPage();
+}
+
+// ── SETTINGS ──
+function loadSettingsPage() {
+  const u = JSON.parse(localStorage.getItem('sv_user') || '{}');
+  if (u.name) document.getElementById('profile-name').value = u.name;
+  if (u.email) {
+    document.getElementById('profile-email').value = u.email;
+    document.getElementById('info-email').textContent = u.email;
+    document.getElementById('info-last').textContent = u.lastActive ? new Date(u.lastActive).toLocaleString('en-IN') : '—';
+  }
+  if (u.emergencyContact) {
+    document.getElementById('ec-email').value = u.emergencyContact;
+    document.getElementById('info-ec').textContent = u.emergencyContact;
+    showEcStatus(u.emergencyContact);
+  } else {
+    showEcStatus('');
+  }
+  document.getElementById('info-items').textContent = allItems.length;
+}
+
+function showEcStatus(email) {
+  const box = document.getElementById('ec-status-box');
+  if (email) {
+    box.innerHTML = `<div class="ec-status ec-set"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Emergency contact set: <strong>${email}</strong></div>`;
+    document.getElementById('info-ec').textContent = email;
+  } else {
+    box.innerHTML = `<div class="ec-status ec-unset"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>No emergency contact set — alerts won't be sent</div>`;
+    document.getElementById('info-ec').textContent = 'Not set';
+  }
+}
+
+async function saveEmergencyContact(btn) {
+  const email = document.getElementById('ec-email').value.trim();
+  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    showToast('Please enter a valid email address', 'err'); return;
+  }
+  btn.classList.add('loading');
+  try {
+    const res = await fetch(`${API}/auth/profile`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ emergencyContact: email })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message);
+    const u = JSON.parse(localStorage.getItem('sv_user') || '{}');
+    u.emergencyContact = email;
+    localStorage.setItem('sv_user', JSON.stringify(u));
+    showEcStatus(email);
+    showToast(email ? '✅ Emergency contact saved!' : '✅ Emergency contact removed');
+  } catch (e) {
+    // demo mode
+    const u = JSON.parse(localStorage.getItem('sv_user') || '{}');
+    u.emergencyContact = email;
+    localStorage.setItem('sv_user', JSON.stringify(u));
+    showEcStatus(email);
+    showToast(email ? '✅ Saved (demo mode)' : '✅ Removed');
+  } finally {
+    btn.classList.remove('loading');
+  }
+}
+
+async function saveProfile(btn) {
+  const name = document.getElementById('profile-name').value.trim();
+  if (!name) { showToast('Name cannot be empty', 'err'); return; }
+  btn.classList.add('loading');
+  try {
+    const res = await fetch(`${API}/auth/profile`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ name })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message);
+    const u = JSON.parse(localStorage.getItem('sv_user') || '{}');
+    u.name = name;
+    localStorage.setItem('sv_user', JSON.stringify(u));
+    document.getElementById('user-name').textContent = name;
+    const init = name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+    document.getElementById('user-ava').textContent = init;
+    showToast('✅ Profile updated!');
+  } catch (e) {
+    const u = JSON.parse(localStorage.getItem('sv_user') || '{}');
+    u.name = name;
+    localStorage.setItem('sv_user', JSON.stringify(u));
+    document.getElementById('user-name').textContent = name;
+    showToast('✅ Saved (demo mode)');
+  } finally {
+    btn.classList.remove('loading');
+  }
+}
+
+// ── VAULT CRUD ──
+function openModal() { document.getElementById('modal').classList.add('open'); }
+function closeModal() { document.getElementById('modal').classList.remove('open'); }
+function closeModalBg(e) { if(e.target===document.getElementById('modal')) closeModal(); }
+
+function selType(el, type) {
+  document.querySelectorAll('.to').forEach(o=>o.classList.remove('sel'));
+  el.classList.add('sel');
+  document.getElementById('m-type').value = type;
+}
+
+async function saveItem(btn) {
+  const name = document.getElementById('m-name').value.trim();
+  const secret = document.getElementById('m-secret').value;
+  if (!name || !secret) { showToast('Name and secret are required', 'err'); return; }
+  btn.classList.add('loading');
+  const body = { type: document.getElementById('m-type').value, name, username: document.getElementById('m-user').value.trim(), secret, tags: document.getElementById('m-tags').value };
+  try {
+    const res = await fetch(`${API}/vault`, { method:'POST', headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`}, body: JSON.stringify(body) });
+    if (!res.ok) throw new Error('Server error');
+    const newItem = await res.json();
+    allItems.unshift(newItem);
+  } catch {
+    allItems.unshift({ _id: Date.now().toString(), ...body, updatedAt: new Date() });
+  }
+  renderAll();
+  closeModal();
+  showToast('🔒 Item encrypted and saved!');
+  ['m-name','m-user','m-secret','m-tags'].forEach(id => document.getElementById(id).value = '');
+  btn.classList.remove('loading');
+}
+
+async function deleteItem(id, btn) {
+  if (!confirm('Delete this vault item? This cannot be undone.')) return;
+  try {
+    await fetch(`${API}/vault/${id}`, { method:'DELETE', headers:{ Authorization:`Bearer ${token}` } });
+  } catch {}
+  allItems = allItems.filter(i=>i._id !== id);
+  renderAll();
+  showToast('🗑 Item deleted');
+}
+
+// ── SESSION ──
+function lockVault() {
+  showToast('Vault locked');
+  setTimeout(logout, 800);
+}
+
+function logout() {
+  clearInterval(timerInterval);
+  localStorage.removeItem('sv_token');
+  localStorage.removeItem('sv_user');
+  window.location.href = 'index.html';
+}
+
+// ── START ──
+loadVault();
+</script>
+</body>
+</html>

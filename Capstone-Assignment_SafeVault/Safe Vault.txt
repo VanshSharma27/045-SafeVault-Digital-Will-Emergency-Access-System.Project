@@ -1,0 +1,62 @@
+Vansh 🔥 good question — ab proper run karna bhi pro-level ka part hai 😎
+
+Tumhare project me 2 cheeze run hoti hain:
+
+1️⃣ Backend (Node + MongoDB)
+2️⃣ Frontend (HTML pages)
+
+🚀 ✅ STEP 1 — BACKEND RUN KARO
+
+Terminal me jao:
+
+cd D:\Safe.vault
+
+Phir run karo:
+
+[[[[npm start]]]]
+
+Expected output:
+
+MongoDB Connected
+SafeVault server running on port 5000
+
+👉 Yeh must hai warna login/register/dashboard kaam nahi karega.
+
+🌐 ✅ STEP 2 — FRONTEND RUN KARO (IMPORTANT)
+
+❌ Direct file open mat karo:
+
+file:///D:/Safe.vault/client/index.html
+
+👉 Yeh galat method hai (kabhi kabhi issues deta hai)
+
+✅ Best Method (Recommended)
+
+Terminal me:
+
+cd client
+npx serve .
+
+Phir browser me open karo:
+
+http://localhost:3000/index.html
+🔥 Alternative (VS Code Easy Method)
+VS Code me index.html open karo
+Right click → Open with Live Server
+🎯 FINAL FLOW
+npm start → backend ON
+npx serve . → frontend ON
+Open → index.html
+⚠ IMPORTANT
+
+Agar pehle se login kiya hua hai:
+
+localStorage.clear()
+
+Console me run karo (for fresh testing)
+
+💎 Simple Samjho
+Kaam	Command
+Backend run	npm start
+Frontend run	npx serve .
+Open site	http://localhost:3000

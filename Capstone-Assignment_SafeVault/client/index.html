@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>SafeVault — Digital Security Vault</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --void:#05050a; --ink:#0c0c18; --surface:#111120; --lift:#181828;
+  --amber:#d4a017; --ag:#e8c04a; --ad:rgba(212,160,23,.12); --ar:rgba(212,160,23,.22);
+  --text:#f2edd8; --muted:#6b6358; --faint:#222238;
+  --red:#e05252; --green:#4ecb7a; --r:12px;
+}
+html,body{height:100%;background:var(--void);color:var(--text);font-family:'Manrope',sans-serif;overflow:hidden}
+
+/* BG */
+.bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none}
+.bg-grid{position:absolute;inset:0;
+  background-image:linear-gradient(rgba(212,160,23,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(212,160,23,.05) 1px,transparent 1px);
+  background-size:64px 64px;animation:gridShift 60s linear infinite}
+@keyframes gridShift{to{background-position:64px 64px}}
+.orb{position:absolute;border-radius:50%;filter:blur(120px);pointer-events:none}
+.o1{width:700px;height:700px;top:-250px;left:-150px;background:radial-gradient(circle,rgba(212,160,23,.1),transparent 70%);animation:d1 20s ease-in-out infinite}
+.o2{width:500px;height:500px;bottom:-150px;right:-100px;background:radial-gradient(circle,rgba(74,144,226,.07),transparent 70%);animation:d2 25s ease-in-out infinite}
+.o3{width:350px;height:350px;top:45%;left:50%;transform:translate(-50%,-50%);background:radial-gradient(circle,rgba(212,160,23,.05),transparent 70%);animation:p3 8s ease-in-out infinite}
+@keyframes d1{0%,100%{transform:translate(0,0)}50%{transform:translate(50px,35px)}}
+@keyframes d2{0%,100%{transform:translate(0,0)}50%{transform:translate(-35px,-50px)}}
+@keyframes p3{0%,100%{opacity:.5;transform:translate(-50%,-50%) scale(1)}50%{opacity:1;transform:translate(-50%,-50%) scale(1.15)}}
+.noise{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.025;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size:200px}
+
+/* LAYOUT */
+.split{position:relative;z-index:2;display:flex;height:100vh}
+
+/* LEFT */
+.left{width:52%;flex-shrink:0;display:flex;flex-direction:column;justify-content:space-between;padding:48px 64px;border-right:1px solid var(--faint);position:relative;overflow:hidden}
+.left::before{content:'';position:absolute;inset:0;background:linear-gradient(145deg,rgba(212,160,23,.04),transparent 55%);pointer-events:none}
+
+.logo{display:flex;align-items:center;gap:14px}
+.logo-box{width:42px;height:42px;border:1.5px solid var(--amber);border-radius:10px;display:flex;align-items:center;justify-content:center;background:var(--ad);position:relative;overflow:hidden}
+.logo-box::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,transparent 40%,rgba(212,160,23,.2) 50%,transparent 60%);animation:sheen 4s ease-in-out infinite}
+@keyframes sheen{0%,100%{transform:translate(-200%,-200%)}50%{transform:translate(200%,200%)}}
+.brand{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1.5px}
+.brand span{color:var(--amber)}
+
+.hero{flex:1;display:flex;flex-direction:column;justify-content:center;padding:36px 0}
+
+/* Vault SVG */
+.vault-wrap{position:relative;width:200px;height:200px;margin:0 auto 44px}
+.v-ring{position:absolute;inset:-12px;border-radius:50%;border:1px solid var(--ar);animation:rp 3s ease-in-out infinite}
+.v-ring:nth-child(2){inset:-24px;border-color:rgba(212,160,23,.1);animation-delay:.6s}
+@keyframes rp{0%,100%{opacity:.4;transform:scale(1)}50%{opacity:.9;transform:scale(1.03)}}
+
+.tagline{font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:var(--amber);margin-bottom:20px;display:flex;align-items:center;gap:10px}
+.tagline::before{content:'';width:28px;height:1px;background:var(--amber)}
+.headline{font-family:'Bebas Neue',sans-serif;font-size:clamp(50px,4.5vw,76px);line-height:.95;letter-spacing:2px;margin-bottom:24px}
+.headline .ghost{-webkit-text-stroke:1.5px var(--amber);color:transparent}
+.sub{font-size:15px;line-height:1.75;color:var(--muted);max-width:400px;margin-bottom:44px;font-weight:300}
+
+.stats{display:flex}
+.stat{flex:1;padding:18px 22px;border:1px solid var(--faint)}
+.stat:not(:last-child){border-right:none}
+.stat:first-child{border-radius:var(--r) 0 0 var(--r)}
+.stat:last-child{border-radius:0 var(--r) var(--r) 0}
+.stat-v{font-family:'Bebas Neue',sans-serif;font-size:30px;color:var(--amber);letter-spacing:1px;line-height:1}
+.stat-l{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:4px}
+
+.pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
+.pill{display:flex;align-items:center;gap:7px;padding:6px 13px;border:1px solid var(--faint);border-radius:100px;font-size:12px;color:var(--muted);transition:all .2s;cursor:default}
+.pill:hover{border-color:var(--ar);color:var(--ag)}
+.pill::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--amber);flex-shrink:0}
+.footer-note{font-size:11px;color:var(--muted);letter-spacing:.5px}
+
+/* RIGHT */
+.right{flex:1;display:flex;flex-direction:column;justify-content:center;padding:48px 72px;background:var(--ink)}
+
+.tabs{display:flex;background:var(--surface);border:1px solid var(--faint);border-radius:10px;padding:4px;margin-bottom:36px;max-width:380px}
+.tab{flex:1;padding:10px;border:none;background:none;color:var(--muted);font-family:'Manrope',sans-serif;font-size:13px;font-weight:500;border-radius:7px;cursor:pointer;transition:all .2s}
+.tab.on{background:var(--amber);color:#0a0700;font-weight:700}
+.tab:not(.on):hover{color:var(--text)}
+
+.pane{max-width:380px;animation:fadeUp .3s ease}
+.pane.hidden{display:none}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+.form-title{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:.5px;margin-bottom:6px}
+.form-sub{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:28px}
+.form-sub a{color:var(--amber);text-decoration:none}
+.form-sub a:hover{color:var(--ag)}
+
+.field{margin-bottom:16px}
+.frow{display:flex;gap:13px}
+.frow .field{flex:1}
+.lbl{display:block;font-size:10px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.iw{position:relative;display:flex;align-items:center}
+.iico{position:absolute;left:13px;width:15px;height:15px;color:var(--muted);pointer-events:none;transition:color .2s;display:flex;align-items:center;justify-content:center}
+.iw:focus-within .iico{color:var(--amber)}
+input[type=text],input[type=email],input[type=password]{
+  width:100%;padding:12px 13px 12px 40px;
+  background:var(--surface);border:1px solid var(--faint);border-radius:9px;
+  color:var(--text);font-family:'Manrope',sans-serif;font-size:13px;outline:none;
+  transition:border-color .2s,background .2s;
+}
+input::placeholder{color:var(--muted)}
+input:focus{border-color:var(--amber);background:rgba(212,160,23,.03)}
+.eye{position:absolute;right:11px;background:none;border:none;color:var(--muted);cursor:pointer;padding:4px;display:flex;align-items:center}
+
+/* strength */
+.sbar{display:flex;gap:4px;margin-top:6px}
+.seg{flex:1;height:3px;border-radius:2px;background:var(--faint);transition:background .3s}
+.seg.w{background:#e05252}.seg.m{background:#d4a017}.seg.g{background:#4ecb7a}
+.slbl{font-size:11px;color:var(--muted);margin-top:4px}
+
+.opts{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px}
+.chk{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);cursor:pointer;user-select:none}
+.chk input{display:none}
+.chk-box{width:16px;height:16px;border:1px solid var(--faint);border-radius:4px;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0}
+.chk input:checked~.chk-box{background:var(--amber);border-color:var(--amber)}
+.forgot{font-size:13px;color:var(--amber);text-decoration:none}
+.forgot:hover{color:var(--ag)}
+
+.btn{width:100%;padding:14px;background:var(--amber);border:none;border-radius:9px;color:#0a0700;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:1px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;position:relative;overflow:hidden;margin-bottom:20px;transition:opacity .15s,transform .1s}
+.btn::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.15),transparent 55%);pointer-events:none}
+.btn:hover{opacity:.92;transform:translateY(-1px)}
+.btn:active{transform:scale(.99)}
+.barr{transition:transform .2s}
+.btn:hover .barr{transform:translateX(5px)}
+.spin{width:18px;height:18px;border:2.5px solid rgba(10,7,0,.3);border-top-color:#0a0700;border-radius:50%;animation:spin .6s linear infinite;display:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading .spin{display:block}
+.loading .btxt,.loading .barr{display:none}
+
+.div{display:flex;align-items:center;gap:12px;margin-bottom:16px;font-size:12px;color:var(--muted)}
+.div::before,.div::after{content:'';flex:1;height:1px;background:var(--faint)}
+
+.oauth{display:flex;gap:10px}
+.oa{flex:1;padding:10px;background:var(--surface);border:1px solid var(--faint);border-radius:9px;color:var(--muted);font-family:'Manrope',sans-serif;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;transition:all .15s}
+.oa:hover{border-color:var(--ar);color:var(--text);background:rgba(212,160,23,.04)}
+.oa svg{width:16px;height:16px;flex-shrink:0}
+
+.sec{display:flex;align-items:center;gap:10px;margin-top:22px;padding:11px 15px;background:var(--ad);border:1px solid var(--ar);border-radius:9px;font-size:12px;color:rgba(212,160,23,.8)}
+.sec svg{width:14px;height:14px;color:var(--amber);flex-shrink:0}
+
+/* TOAST */
+.toast{position:fixed;bottom:26px;right:26px;z-index:9999;background:var(--lift);border:1px solid var(--ar);padding:12px 18px;border-radius:10px;font-size:13px;color:var(--text);display:flex;align-items:center;gap:10px;pointer-events:none;transform:translateY(60px);opacity:0;transition:all .35s cubic-bezier(.34,1.56,.64,1);max-width:300px}
+.toast.show{transform:translateY(0);opacity:1}
+.toast svg{width:14px;height:14px;color:var(--amber);flex-shrink:0}
+
+@media(max-width:880px){
+  .split{flex-direction:column;overflow-y:auto;height:auto}
+  .left{width:100%;border-right:none;border-bottom:1px solid var(--faint);padding:32px}
+  .vault-wrap{display:none}
+  .right{padding:32px}
+  html,body{overflow:auto}
+}
+</style>
+</head>
+<body>
+<div class="bg-canvas">
+  <div class="bg-grid"></div>
+  <div class="orb o1"></div>
+  <div class="orb o2"></div>
+  <div class="orb o3"></div>
+</div>
+<div class="noise"></div>
+
+<div class="split">
+
+  <!-- LEFT HERO -->
+  <section class="left">
+    <div class="logo">
+      <div class="logo-box">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#d4a017" stroke-width="1.6">
+          <rect x="3" y="6" width="18" height="15" rx="2.5"/>
+          <circle cx="12" cy="13.5" r="2.8"/>
+          <path d="M15 7V5a3 3 0 0 0-6 0v2"/>
+          <circle cx="12" cy="13.5" r="1.1" fill="#d4a017"/>
+        </svg>
+      </div>
+      <span class="brand">Safe<span>Vault</span></span>
+    </div>
+
+    <div class="hero">
+      <div class="vault-wrap">
+        <div class="v-ring"></div>
+        <div class="v-ring"></div>
+        <svg width="200" height="200" viewBox="0 0 200 200" fill="none">
+          <rect x="16" y="16" width="168" height="168" rx="16" fill="#111120" stroke="#222238" stroke-width="1.5"/>
+          <rect x="27" y="27" width="146" height="146" rx="10" fill="none" stroke="rgba(212,160,23,.1)" stroke-width="1"/>
+          <circle cx="38" cy="38" r="7" fill="#181828" stroke="#d4a017" stroke-width="1.2"/>
+          <circle cx="162" cy="38" r="7" fill="#181828" stroke="#d4a017" stroke-width="1.2"/>
+          <circle cx="38" cy="162" r="7" fill="#181828" stroke="#d4a017" stroke-width="1.2"/>
+          <circle cx="162" cy="162" r="7" fill="#181828" stroke="#d4a017" stroke-width="1.2"/>
+          <circle cx="100" cy="100" r="48" fill="#0c0c18" stroke="#d4a017" stroke-width="1.5"/>
+          <line x1="100" y1="55" x2="100" y2="64" stroke="rgba(212,160,23,.5)" stroke-width="2" stroke-linecap="round"/>
+          <line x1="100" y1="136" x2="100" y2="145" stroke="rgba(212,160,23,.5)" stroke-width="2" stroke-linecap="round"/>
+          <line x1="55" y1="100" x2="64" y2="100" stroke="rgba(212,160,23,.5)" stroke-width="2" stroke-linecap="round"/>
+          <line x1="136" y1="100" x2="145" y2="100" stroke="rgba(212,160,23,.5)" stroke-width="2" stroke-linecap="round"/>
+          <line x1="69" y1="69" x2="75" y2="75" stroke="rgba(212,160,23,.25)" stroke-width="1.5" stroke-linecap="round"/>
+          <line x1="125" y1="125" x2="131" y2="131" stroke="rgba(212,160,23,.25)" stroke-width="1.5" stroke-linecap="round"/>
+          <line x1="131" y1="69" x2="125" y2="75" stroke="rgba(212,160,23,.25)" stroke-width="1.5" stroke-linecap="round"/>
+          <line x1="75" y1="125" x2="69" y2="131" stroke="rgba(212,160,23,.25)" stroke-width="1.5" stroke-linecap="round"/>
+          <circle cx="100" cy="100" r="31" fill="#111120" stroke="rgba(212,160,23,.18)" stroke-width="1"/>
+          <g style="transform-origin:100px 100px;animation:rot 7s linear infinite">
+            <line x1="100" y1="100" x2="100" y2="72" stroke="#d4a017" stroke-width="2.5" stroke-linecap="round"/>
+            <circle cx="100" cy="68" r="4" fill="#d4a017"/>
+          </g>
+          <circle cx="100" cy="100" r="8.5" fill="#d4a017"/>
+          <circle cx="100" cy="100" r="4" fill="#0c0c18"/>
+          <rect x="155" y="91" width="18" height="19" rx="3.5" fill="#181828" stroke="rgba(212,160,23,.4)" stroke-width="1"/>
+          <circle cx="164" cy="97.5" r="2.5" fill="#d4a017" opacity=".7"/>
+          <circle cx="164" cy="104.5" r="2.5" fill="#d4a017" opacity=".7"/>
+        </svg>
+        <style>@keyframes rot{to{transform:rotate(360deg)}}</style>
+      </div>
+
+      <p class="tagline">Military-grade protection</p>
+      <h1 class="headline">Your<br><span class="ghost">Digital</span><br>Fortress</h1>
+      <p class="sub">Zero-knowledge AES-256 encryption. Your passwords, cards, documents — sealed and sovereign.</p>
+
+      <div class="stats">
+        <div class="stat"><div class="stat-v">256</div><div class="stat-l">Bit AES</div></div>
+        <div class="stat"><div class="stat-v">0</div><div class="stat-l">Log Policy</div></div>
+        <div class="stat"><div class="stat-v">∞</div><div class="stat-l">Encrypted</div></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="pills">
+        <span class="pill">End-to-end encrypted</span>
+        <span class="pill">JWT secured</span>
+        <span class="pill">Auto-expiry alerts</span>
+        <span class="pill">bcrypt hashed</span>
+      </div>
+      <p class="footer-note" style="margin-top:20px">SafeVault v2.0 · Express + MongoDB · AES-256 + bcrypt</p>
+    </div>
+  </section>
+
+  <!-- RIGHT AUTH -->
+  <section class="right">
+    <div class="tabs">
+      <button class="tab on" onclick="switchTab('login')">Sign In</button>
+      <button class="tab" onclick="switchTab('register')">Register</button>
+    </div>
+
+    <!-- LOGIN -->
+    <div id="pane-login" class="pane">
+      <div class="form-title">Access Vault</div>
+      <div class="form-sub">No account? <a href="#" onclick="switchTab('register')">Create one free →</a></div>
+
+      <div class="field">
+        <label class="lbl">Email address</label>
+        <div class="iw">
+          <div class="iico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="4" width="20" height="16" rx="2.5"/><path d="M2 8l10 6 10-6"/></svg></div>
+          <input type="email" id="l-email" placeholder="you@example.com" autocomplete="email">
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="lbl">Master password</label>
+        <div class="iw">
+          <div class="iico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/><circle cx="12" cy="16" r="1.5" fill="currentColor"/></svg></div>
+          <input type="password" id="l-pass" placeholder="••••••••••••" autocomplete="current-password">
+          <button class="eye" type="button" onclick="toggleEye('l-pass')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="opts">
+        <label class="chk">
+          <input type="checkbox" id="l-rem">
+          <span class="chk-box"><svg width="9" height="9" viewBox="0 0 10 10" fill="none" stroke="#0a0700" stroke-width="2.2"><polyline points="1,5 4,8 9,2"/></svg></span>
+          Remember me
+        </label>
+        <a href="#" class="forgot">Forgot password?</a>
+      </div>
+
+      <button class="btn" onclick="doLogin(this)">
+        <div class="spin"></div>
+        <span class="btxt">UNLOCK VAULT</span>
+        <svg class="barr" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#0a0700" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </button>
+
+      <div class="div">or continue with</div>
+      <div class="oauth">
+        <button class="oa" onclick="showToast('Google auth — coming soon')">
+          <svg viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+          Google
+        </button>
+        <button class="oa" onclick="showToast('GitHub auth — coming soon')">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+          GitHub
+        </button>
+      </div>
+
+      <div class="sec">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+        AES-256 + zero-knowledge · Your key, never stored
+      </div>
+    </div>
+
+    <!-- REGISTER -->
+    <div id="pane-register" class="pane hidden">
+      <div class="form-title">Create Vault</div>
+      <div class="form-sub">Already secured? <a href="#" onclick="switchTab('login')">Sign in →</a></div>
+
+      <div class="frow">
+        <div class="field">
+          <label class="lbl">First name</label>
+          <div class="iw">
+            <div class="iico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg></div>
+            <input type="text" placeholder="John" id="r-first">
+          </div>
+        </div>
+        <div class="field">
+          <label class="lbl">Last name</label>
+          <div class="iw">
+            <div class="iico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg></div>
+            <input type="text" placeholder="Doe" id="r-last">
+          </div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="lbl">Email address</label>
+        <div class="iw">
+          <div class="iico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="4" width="20" height="16" rx="2.5"/><path d="M2 8l10 6 10-6"/></svg></div>
+          <input type="email" placeholder="you@example.com" id="r-email">
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="lbl">Master password</label>
+        <div class="iw">
+          <div class="iico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/><circle cx="12" cy="16" r="1.5" fill="currentColor"/></svg></div>
+          <input type="password" placeholder="Min. 8 characters" id="r-pass" oninput="checkStrength(this.value)" autocomplete="new-password">
+          <button class="eye" type="button" onclick="toggleEye('r-pass')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+        <div class="sbar"><div class="seg" id="s1"></div><div class="seg" id="s2"></div><div class="seg" id="s3"></div><div class="seg" id="s4"></div></div>
+        <div class="slbl" id="slbl">Create a strong master password</div>
+      </div>
+
+      <button class="btn" style="margin-top:6px" onclick="doRegister(this)">
+        <div class="spin"></div>
+        <span class="btxt">INITIALIZE VAULT</span>
+        <svg class="barr" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#0a0700" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </button>
+
+      <div class="sec">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        Master password never stored · bcrypt hashed locally
+      </div>
+    </div>
+  </section>
+</div>
+
+<div class="toast" id="toast">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+  <span id="tmsg"></span>
+</div>
+
+<script>
+const API = '/api';
+
+function switchTab(t) {
+  document.querySelectorAll('.tab').forEach((b,i) => b.classList.toggle('on', (i===0&&t==='login')||(i===1&&t==='register')));
+  document.getElementById('pane-login').classList.toggle('hidden', t !== 'login');
+  document.getElementById('pane-register').classList.toggle('hidden', t !== 'register');
+}
+
+function toggleEye(id) {
+  const i = document.getElementById(id);
+  i.type = i.type === 'password' ? 'text' : 'password';
+}
+
+function checkStrength(v) {
+  let s = 0;
+  if (v.length >= 8) s++;
+  if (/[A-Z]/.test(v)) s++;
+  if (/[0-9]/.test(v)) s++;
+  if (/[^A-Za-z0-9]/.test(v)) s++;
+  const cls = ['','w','m','m','g'];
+  const labs = ['Create a strong master password','Weak — add more characters','Medium — add numbers or symbols','Good — almost there!','Excellent — vault sealed!'];
+  [1,2,3,4].forEach(n => {
+    const seg = document.getElementById('s'+n);
+    seg.className = 'seg' + (n <= s ? ' ' + cls[s] : '');
+  });
+  document.getElementById('slbl').textContent = labs[s];
+}
+
+function showToast(msg, dur=2800) {
+  const t = document.getElementById('toast');
+  document.getElementById('tmsg').textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._t);
+  t._t = setTimeout(() => t.classList.remove('show'), dur);
+}
+
+async function doLogin(btn) {
+  const email = document.getElementById('l-email').value.trim();
+  const password = document.getElementById('l-pass').value;
+  if (!email || !password) { showToast('Please fill in all fields'); return; }
+  btn.classList.add('loading');
+  try {
+    const res = await fetch(`${API}/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message);
+    localStorage.setItem('sv_token', data.token);
+    localStorage.setItem('sv_user', JSON.stringify(data.user));
+    showToast('Vault unlocked! Redirecting…');
+    setTimeout(() => window.location.href = 'dashboard.html', 1200);
+  } catch (err) {
+    showToast(err.message || 'Login failed');
+    btn.classList.remove('loading');
+  }
+}
+
+async function doRegister(btn) {
+  const first = document.getElementById('r-first').value.trim();
+  const last = document.getElementById('r-last').value.trim();
+  const email = document.getElementById('r-email').value.trim();
+  const password = document.getElementById('r-pass').value;
+  if (!email || !password) { showToast('Please fill in all fields'); return; }
+  if (password.length < 8) { showToast('Password must be at least 8 characters'); return; }
+  btn.classList.add('loading');
+  try {
+    const res = await fetch(`${API}/auth/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: `${first} ${last}`.trim() || email, email, password })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message);
+    localStorage.setItem('sv_token', data.token);
+    showToast('Vault created! Check your email to verify.');
+    setTimeout(() => window.location.href = 'dashboard.html', 1400);
+  } catch (err) {
+    showToast(err.message || 'Registration failed');
+    btn.classList.remove('loading');
+  }
+}
+
+// Redirect if already logged in
+if (localStorage.getItem('sv_token')) window.location.href = 'dashboard.html';
+</script>
+</body>
+</html>
