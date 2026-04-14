@@ -1,0 +1,22 @@
+/*
+  static/style.css
+  Simple Blog — Experiment-5
+  Additional / override styles (base styles live in base.html)
+*/
+
+/* Responsive: narrow screens */
+@media (max-width: 600px) {
+  .header-inner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: .6rem;
+  }
+
+  nav { flex-wrap: wrap; }
+
+  main { padding: 1.5rem 1rem; }
+
+  .form-card { padding: 1.4rem 1.2rem; }
+
+  .post-card { padding: 1.2rem 1rem; }
+}

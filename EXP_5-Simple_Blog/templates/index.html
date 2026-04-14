@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}Home — Simple Blog{% endblock %}
+
+{% block content %}
+
+  <h1 class="page-heading">Latest Posts</h1>
+
+  {% if posts %}
+    <!-- Loop over every post and render a card -->
+    {% for post in posts|reverse %}
+    <article class="post-card">
+
+      <h2>{{ post.title }}</h2>
+      <p class="post-meta">Published on {{ post.date }}</p>
+      <p class="post-content">{{ post.content }}</p>
+
+      <div class="post-actions">
+        <!-- Edit button: navigates to the edit form -->
+        <a href="{{ url_for('edit', post_id=post.id) }}" class="btn btn-secondary">
+          ✏️ Edit
+        </a>
+
+        <!-- Delete button: submits a POST form to delete route -->
+        <form action="{{ url_for('delete', post_id=post.id) }}" method="POST"
+              onsubmit="return confirm('Delete this post? This cannot be undone.');">
+          <button type="submit" class="btn btn-danger">🗑 Delete</button>
+        </form>
+      </div>
+
+    </article>
+    {% endfor %}
+
+  {% else %}
+    <!-- Empty state when no posts exist -->
+    <div class="empty-state">
+      <div class="empty-icon">📝</div>
+      <p>No posts yet. Be the first to write something!</p>
+      <a href="{{ url_for('create') }}" class="btn btn-primary">Create Your First Post</a>
+    </div>
+  {% endif %}
+
+{% endblock %}

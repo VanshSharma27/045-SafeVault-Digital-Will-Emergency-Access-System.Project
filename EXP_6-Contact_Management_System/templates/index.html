@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block title %}All Contacts{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">All Contacts</h1>
+    <p style="color:var(--muted); font-size:0.9rem; margin-top:0.25rem;">
+      {{ contacts|length }} contact{% if contacts|length != 1 %}s{% endif %}
+      {% if query %} matching "<strong style="color:var(--accent)">{{ query }}</strong>"{% endif %}
+    </p>
+  </div>
+
+  <div style="display:flex; gap:0.75rem; align-items:center; flex-wrap:wrap;">
+    <!-- Search form -->
+    <form method="GET" action="{{ url_for('index') }}" class="search-bar">
+      <input
+        type="text"
+        name="q"
+        value="{{ query }}"
+        placeholder="Search name or phone…"
+        aria-label="Search contacts"
+      />
+      <button type="submit" class="btn btn-secondary">🔍</button>
+      {% if query %}
+        <a href="{{ url_for('index') }}" class="btn btn-secondary" title="Clear search">✕</a>
+      {% endif %}
+    </form>
+
+    <a href="{{ url_for('add_contact') }}" class="btn btn-primary">＋ Add Contact</a>
+  </div>
+</div>
+
+<div class="card">
+  {% if contacts %}
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Name</th>
+          <th>Phone</th>
+          <th>Email</th>
+          <th>Address</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for contact in contacts %}
+        <tr>
+          <td><span class="badge">{{ loop.index }}</span></td>
+          <td><strong>{{ contact.name }}</strong></td>
+          <td>{{ contact.phone }}</td>
+          <td>
+            <a href="mailto:{{ contact.email }}"
+               style="color:var(--accent2); text-decoration:none;">
+              {{ contact.email }}
+            </a>
+          </td>
+          <td style="color:var(--muted)">{{ contact.address or '—' }}</td>
+          <td>
+            <div class="actions">
+              <a href="{{ url_for('edit_contact', contact_id=contact.id) }}"
+                 class="btn btn-edit">✏️ Edit</a>
+              <form method="POST"
+                    action="{{ url_for('delete_contact', contact_id=contact.id) }}"
+                    onsubmit="return confirm('Delete {{ contact.name }}?');">
+                <button type="submit" class="btn btn-danger">🗑 Delete</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <div class="icon">📭</div>
+    {% if query %}
+      <p>No contacts match "<strong>{{ query }}</strong>".</p>
+      <a href="{{ url_for('index') }}" class="btn btn-secondary">Clear Search</a>
+    {% else %}
+      <p>No contacts yet. Add your first one!</p>
+      <a href="{{ url_for('add_contact') }}" class="btn btn-primary">＋ Add Contact</a>
+    {% endif %}
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,26 @@
+/*
+ * Contact Management System — Extra Styles
+ * Supplemental CSS loaded by base.html
+ * (core styles live in <style> inside base.html for zero-dep portability)
+ */
+
+/* Smooth scroll */
+html { scroll-behavior: smooth; }
+
+/* Pulse animation on accent */
+@keyframes pulse-border {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(110,231,183,0.4); }
+  50%       { box-shadow: 0 0 0 6px rgba(110,231,183,0); }
+}
+
+.btn-primary:focus { animation: pulse-border 1.2s ease; }
+
+/* Table row fade-in */
+tbody tr {
+  animation: row-in 0.25s ease both;
+}
+
+@keyframes row-in {
+  from { opacity: 0; transform: translateX(-6px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
