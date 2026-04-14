@@ -1,0 +1,93 @@
+<!--  -->
+<!-- Name: Vansh 
+Project: Personal Portfolio -->
+<!--  -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Vansh Portfolio</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header>
+    <h1>Vansh</h1>
+    <p>I am learning Web Development</p>
+</header>
+
+<nav>
+    <a href="#skills">Skills</a>
+    <a href="#projects">Projects</a>
+    <a href="#contact">Contact</a>
+</nav>
+
+<section class="welcome">
+    <h2>Welcome</h2>
+    <p>This is my beginner portfolio website.</p>
+    <button onclick="showMessage()">Click Me</button>
+</section>
+
+<section id="skills">
+    <h2>
+        My Skills
+        <button onclick="toggleSection('skillsContent')">Hide / Show</button>
+    </h2>
+    <ul id="skillsContent">
+        <li>HTML</li>
+        <li>CSS</li>
+        <li>JavaScript (Beginner)</li>
+    </ul>
+</section>
+
+<section id="projects">
+    <h2>
+        My Projects
+        <button onclick="toggleSection('projectsContent')">Hide / Show</button>
+    </h2>
+
+    <div id="projectsContent">
+        <div class="card">
+            <h3>Portfolio Website</h3>
+            <p>This is my personal portfolio made using HTML, CSS and JavaScript.</p>
+        </div>
+
+        <div class="card">
+            <h3>Simple HTML Page</h3>
+            <p>A basic web page created using only HTML.</p>
+        </div>
+    </div>
+</section>
+
+<section id="contact">
+    <h2>Contact Me</h2>
+
+    <form onsubmit="submitForm(); return false;">
+        <label>Name:</label>
+        <input type="text" required>
+
+        <label>Email:</label>
+        <input type="email" required>
+
+        <label>Message:</label>
+        <textarea rows="4" required></textarea>
+
+        <button type="submit">Submit</button>
+    </form>
+
+    <p id="result"></p>
+
+    <a href="https://github.com/VanshSharma27" target="_blank">GitHub</a> |
+    <a href="www.linkedin.com/in/vansh-sharma-3b6a40388" target="_blank">LinkedIn</a>
+</section>
+
+<footer>
+    <p>© 2026 Vansh Sharma</p>
+</footer>
+
+<button id="scrollBtn" onclick="scrollToTop()">⬆</button>
+
+<script src="script.js"></script>
+</body>
+</html>
