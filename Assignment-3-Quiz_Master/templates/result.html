@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Master - Results</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="page-wrapper">
+        <header class="site-header">
+            <div class="logo">🎯 Quiz Master</div>
+            <nav class="nav-links"><span>Results</span></nav>
+        </header>
+
+        <main class="result-main">
+            <!-- Score Card -->
+            <div class="score-card">
+                <div class="grade-badge grade-{{ grade | replace('+','plus') }}">{{ grade }}</div>
+                <h1 class="score-title">Quiz Completed!</h1>
+                <p class="feedback-msg">{{ feedback }}</p>
+
+                <div class="score-stats">
+                    <div class="stat-box correct-box">
+                        <span class="stat-num">{{ score }}</span>
+                        <span class="stat-label">Correct</span>
+                    </div>
+                    <div class="stat-box wrong-box">
+                        <span class="stat-num">{{ (total - score - results | selectattr('skipped') | list | length) }}</span>
+                        <span class="stat-label">Wrong</span>
+                    </div>
+                    <div class="stat-box skip-box">
+                        <span class="stat-num">{{ results | selectattr('skipped') | list | length }}</span>
+                        <span class="stat-label">Skipped</span>
+                    </div>
+                    <div class="stat-box final-box">
+                        <span class="stat-num">{{ "%.2f" | format(final_score) }} / {{ total }}</span>
+                        <span class="stat-label">Final Score</span>
+                    </div>
+                </div>
+
+                <div class="extra-stats">
+                    <span>⏱️ Time Taken: <strong>{{ time_taken }}</strong></span>
+                    <span>➖ Penalty: <strong>-{{ "%.2f" | format(negative) }}</strong></span>
+                </div>
+
+                <div class="result-actions">
+                    <a href="/start" class="btn-restart">🔄 Restart Quiz</a>
+                    <a href="/" class="btn-home">🏠 Home</a>
+                </div>
+            </div>
+
+            <!-- Detailed Review -->
+            <div class="review-section">
+                <h2>📖 Answer Review</h2>
+                {% for r in results %}
+                <div class="review-card {% if r.correct %}card-correct{% elif r.skipped %}card-skipped{% else %}card-wrong{% endif %}">
+                    <div class="review-header">
+                        <span class="review-qnum">Q{{ loop.index }}</span>
+                        <span class="review-status">
+                            {% if r.correct %}✅ Correct (+1)
+                            {% elif r.skipped %}⬜ Skipped (0)
+                            {% else %}❌ Wrong (-0.25)
+                            {% endif %}
+                        </span>
+                    </div>
+                    <p class="review-question">{{ r.question }}</p>
+                    <div class="review-options">
+                        {% for opt in r.options %}
+                        <div class="review-option
+                            {% if opt == r.answer %}opt-correct{% endif %}
+                            {% if opt == r.selected and not r.correct %}opt-wrong{% endif %}">
+                            {% if opt == r.answer %}✅ {% elif opt == r.selected %}❌ {% else %}○ {% endif %}
+                            {{ opt }}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% if r.skipped %}
+                    <p class="review-note">You skipped this question. Correct answer: <strong>{{ r.answer }}</strong></p>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </main>
+
+        <footer class="site-footer">
+            <p>Assignment 3 &mdash; Web Programming with Python and JavaScript Lab</p>
+        </footer>
+    </div>
+</body>
+</html>

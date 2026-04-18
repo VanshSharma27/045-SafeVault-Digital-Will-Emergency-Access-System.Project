@@ -1,0 +1,116 @@
+<!--
+    checkout.html - Checkout Page
+    Project: ShopEasy E-Commerce Website
+    Author: Vansh Sharma
+    Date: April 2026
+
+    Collects user details (name, email, address, city) and
+    shows order summary before the final "Place Order" submit.
+-->
+{% extends 'store/base.html' %}
+
+{% block title %}Checkout{% endblock %}
+
+{% block content %}
+
+<section class="checkout-section">
+    <div class="section-header">
+        <h2 class="section-title">📦 Checkout</h2>
+        <p class="section-subtitle">Almost there! Fill in your details to complete your order.</p>
+    </div>
+
+    <div class="checkout-layout">
+
+        <!-- ===== CHECKOUT FORM ===== -->
+        <div class="checkout-form-box">
+            <h3 class="form-title">🙋 Your Details</h3>
+
+            <!--
+                POST to place_order view.
+                {% csrf_token %} is REQUIRED by Django for form security.
+            -->
+            <form action="{% url 'place_order' %}" method="post" id="checkout-form">
+                {% csrf_token %}
+
+                <div class="form-group">
+                    <label for="name">👤 Full Name *</label>
+                    <input type="text" id="name" name="name" class="form-input"
+                           placeholder="e.g. Vansh Sharma" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">📧 Email Address</label>
+                    <input type="email" id="email" name="email" class="form-input"
+                           placeholder="e.g. vansh@example.com">
+                </div>
+
+                <div class="form-group">
+                    <label for="address">🏠 Delivery Address *</label>
+                    <textarea id="address" name="address" class="form-input" rows="3"
+                              placeholder="e.g. 42, MG Road, Sector 5" required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="city">🏙️ City *</label>
+                    <input type="text" id="city" name="city" class="form-input"
+                           placeholder="e.g. Delhi" required>
+                </div>
+
+                <!-- Simulated payment note -->
+                <div class="payment-note">
+                    💳 <strong>Payment (Simulated):</strong> This is a demo checkout. No real payment is required!
+                </div>
+
+                <button type="submit" class="btn btn-place-order">
+                    🎉 Place Order
+                </button>
+
+            </form>
+        </div>
+
+        <!-- ===== ORDER SUMMARY ===== -->
+        <div class="checkout-summary">
+            <h3 class="summary-title">🧾 Your Order</h3>
+
+            {% for item in cart_items %}
+            <div class="checkout-item">
+                <span>{{ item.emoji }} {{ item.name }} × {{ item.quantity }}</span>
+                <span>₹{{ item.total }}</span>
+            </div>
+            {% endfor %}
+
+            <hr class="summary-divider">
+
+            <div class="summary-row">
+                <span>Delivery:</span>
+                <span class="free-tag">FREE ✅</span>
+            </div>
+
+            <div class="summary-row total-row">
+                <strong>Total Payable:</strong>
+                <strong class="checkout-total">₹{{ cart_total }}</strong>
+            </div>
+
+            <a href="{% url 'cart' %}" class="btn btn-outline">← Edit Cart</a>
+        </div>
+
+    </div>
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Client-side validation before form submits
+    document.getElementById('checkout-form').addEventListener('submit', function(e) {
+        const name    = document.getElementById('name').value.trim();
+        const address = document.getElementById('address').value.trim();
+        const city    = document.getElementById('city').value.trim();
+
+        if (!name || !address || !city) {
+            e.preventDefault();
+            alert('⚠️ Please fill in all required fields (Name, Address, City)!');
+        }
+    });
+</script>
+{% endblock %}

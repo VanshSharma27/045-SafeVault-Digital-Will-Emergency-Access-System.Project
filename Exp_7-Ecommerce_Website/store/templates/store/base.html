@@ -1,0 +1,64 @@
+<!--
+    base.html - Base Template
+    Project: ShopEasy E-Commerce Website
+    Author: Vansh Sharma
+    Date: April 2026
+
+    All other templates extend this file.
+    Provides navbar, footer, CSS/JS links, toast notification.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}ShopEasy{% endblock %} | ShopEasy</title>
+
+    {% load static %}
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700;800&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Main stylesheet -->
+    <link rel="stylesheet" href="{% static 'store/css/style.css' %}">
+</head>
+<body>
+
+    <!-- ===== NAVBAR ===== -->
+    <nav class="navbar">
+        <div class="nav-container">
+
+            <a href="{% url 'index' %}" class="nav-logo">🛍️ ShopEasy</a>
+
+            <div class="nav-links">
+                <a href="{% url 'index' %}" class="nav-link">🏠 Home</a>
+                <a href="{% url 'cart' %}" class="nav-link cart-link">
+                    🛒 Cart
+                    <span class="cart-badge" id="cart-badge">{{ cart_count }}</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="footer">
+        <p>🛍️ <strong>ShopEasy</strong> — Your Friendly Online Store</p>
+        <p>Made with ❤️ by <strong>Vansh Sharma</strong> | Experiment-7 | April 2026</p>
+    </footer>
+
+    <!-- Toast notification popup -->
+    <div class="toast" id="toast-message"></div>
+
+    <!-- Main JS -->
+    <script src="{% static 'store/js/script.js' %}"></script>
+
+    {% block extra_js %}{% endblock %}
+
+</body>
+</html>

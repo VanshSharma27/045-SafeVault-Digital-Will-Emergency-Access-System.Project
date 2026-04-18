@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Master - Home</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="page-wrapper">
+        <header class="site-header">
+            <div class="logo">🎯 Quiz Master</div>
+            <nav class="nav-links">
+                <span>Web Programming Lab</span>
+            </nav>
+        </header>
+
+        <main class="home-main">
+            <div class="hero-card">
+                <div class="hero-icon">🧠</div>
+                <h1 class="hero-title">Welcome to <span class="accent">Quiz Master</span></h1>
+                <p class="hero-subtitle">Test your knowledge in Web Development, Python & Flask</p>
+
+                <div class="info-grid">
+                    <div class="info-box">
+                        <span class="info-icon">📝</span>
+                        <span class="info-label">10 Questions</span>
+                    </div>
+                    <div class="info-box">
+                        <span class="info-icon">⏱️</span>
+                        <span class="info-label">5 Min Timer</span>
+                    </div>
+                    <div class="info-box">
+                        <span class="info-icon">🔀</span>
+                        <span class="info-label">Shuffled</span>
+                    </div>
+                    <div class="info-box">
+                        <span class="info-icon">➖</span>
+                        <span class="info-label">-0.25 Marking</span>
+                    </div>
+                </div>
+
+                <div class="rules-box">
+                    <h3>📋 Rules</h3>
+                    <ul>
+                        <li>Each correct answer earns <strong>+1 mark</strong></li>
+                        <li>Each wrong answer deducts <strong>-0.25 marks</strong></li>
+                        <li>Skipped questions carry <strong>no penalty</strong></li>
+                        <li>Questions and options are <strong>shuffled</strong> every attempt</li>
+                        <li>Timer auto-submits at <strong>5 minutes</strong></li>
+                    </ul>
+                </div>
+
+                <a href="/start" class="btn-start">
+                    🚀 Start Quiz
+                </a>
+            </div>
+        </main>
+
+        <footer class="site-footer">
+            <p>Assignment 3 &mdash; Web Programming with Python and JavaScript Lab</p>
+        </footer>
+    </div>
+</body>
+</html>

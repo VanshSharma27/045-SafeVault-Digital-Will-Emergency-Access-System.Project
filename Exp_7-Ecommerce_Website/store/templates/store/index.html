@@ -1,0 +1,87 @@
+<!--
+    index.html - Homepage / Product Listing
+    Project: ShopEasy E-Commerce Website
+    Author: Vansh Sharma
+    Date: April 2026
+
+    Shows a hero banner and all products in a responsive card grid.
+    Each product card has an "Add to Cart" button (AJAX, no page reload).
+-->
+{% extends 'store/base.html' %}
+
+{% block title %}Home - Shop Products{% endblock %}
+
+{% block content %}
+
+<!-- ===== HERO SECTION ===== -->
+<section class="hero">
+    <div class="hero-content">
+        <h1 class="hero-title">Welcome to <span class="highlight">ShopEasy!</span> 🛍️</h1>
+        <p class="hero-subtitle">Discover amazing products at unbeatable prices. Quality you can trust!</p>
+        <a href="#products" class="btn btn-hero">Shop Now ↓</a>
+    </div>
+
+    <div class="hero-badges">
+        <div class="badge">🚚 Free Delivery</div>
+        <div class="badge">🔒 Secure Payment</div>
+        <div class="badge">⭐ Top Quality</div>
+        <div class="badge">↩️ Easy Returns</div>
+    </div>
+</section>
+
+<!-- ===== PRODUCTS SECTION ===== -->
+<section class="products-section" id="products">
+
+    <div class="section-header">
+        <h2 class="section-title">🛒 Our Products</h2>
+        <p class="section-subtitle">{{ products.count }} amazing product{{ products.count|pluralize }} available!</p>
+    </div>
+
+    <div class="products-grid">
+
+        {% for product in products %}
+        <div class="product-card" id="product-{{ product.id }}">
+
+            <!-- Emoji image area with category badge -->
+            <div class="product-image">
+                <span class="product-emoji">{{ product.emoji }}</span>
+                <span class="category-badge">{{ product.get_category_display }}</span>
+            </div>
+
+            <!-- Product details -->
+            <div class="product-info">
+                <h3 class="product-name">{{ product.name }}</h3>
+                <p class="product-description">{{ product.description }}</p>
+
+                <div class="product-footer">
+                    <span class="product-price">₹{{ product.price }}</span>
+
+                    <!-- Add to Cart → calls addToCart() in script.js via AJAX -->
+                    <button
+                        class="btn btn-add-cart"
+                        onclick="addToCart({{ product.id }}, '{{ product.name }}')"
+                        id="btn-{{ product.id }}"
+                    >
+                        + Add to Cart
+                    </button>
+                </div>
+            </div>
+
+        </div>
+        {% empty %}
+        <div class="empty-message">
+            <p>😕 No products available right now. Add some via the admin panel!</p>
+        </div>
+        {% endfor %}
+
+    </div>
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // CSRF token for Django AJAX POST requests
+    const CSRF_TOKEN = '{{ csrf_token }}';
+</script>
+{% endblock %}

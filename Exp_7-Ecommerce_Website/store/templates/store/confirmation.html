@@ -1,0 +1,75 @@
+<!--
+    confirmation.html - Order Confirmation Page
+    Project: ShopEasy E-Commerce Website
+    Author: Vansh Sharma
+    Date: April 2026
+
+    Shown after a successful order is placed.
+    Displays order number, delivery details, and item summary.
+    Cart is cleared at this point.
+-->
+{% extends 'store/base.html' %}
+
+{% block title %}Order Confirmed! 🎉{% endblock %}
+
+{% block content %}
+
+<section class="confirmation-section">
+    <div class="confirmation-box">
+
+        <!-- Animated success icon -->
+        <div class="success-icon">✅</div>
+
+        <h2 class="confirmation-title">Order Placed Successfully!</h2>
+        <p class="confirmation-subtitle">
+            Thank you, <strong>{{ name }}</strong>! 🎉 Your order is confirmed and on its way.
+        </p>
+
+        <!-- Order number -->
+        <div class="order-number-box">
+            <p>Order Number</p>
+            <h3 class="order-number">#{{ order_number }}</h3>
+        </div>
+
+        <!-- Delivery info -->
+        <div class="delivery-info">
+            <p>📦 Delivering to: <strong>{{ address }}, {{ city }}</strong></p>
+            {% if email %}
+            <p>📧 Confirmation sent to: <strong>{{ email }}</strong></p>
+            {% endif %}
+            <p>⏱️ Expected delivery: <strong>3–5 business days</strong></p>
+        </div>
+
+        <!-- Items ordered -->
+        <div class="order-summary-box">
+            <h4>🧾 Order Summary</h4>
+
+            {% for item in order_items %}
+            <div class="order-item-row">
+                <span>{{ item.emoji }} {{ item.name }} × {{ item.quantity }}</span>
+                <span>₹{{ item.total }}</span>
+            </div>
+            {% endfor %}
+
+            <hr class="summary-divider">
+
+            <div class="order-item-row total-row">
+                <strong>Total Paid:</strong>
+                <strong class="confirm-total">₹{{ order_total }}</strong>
+            </div>
+        </div>
+
+        <!-- Simulation disclaimer -->
+        <div class="simulation-note">
+            ℹ️ This is a simulated order for Experiment-7 demo purposes. No real payment was processed.
+        </div>
+
+        <!-- Actions -->
+        <div class="confirmation-actions">
+            <a href="{% url 'index' %}" class="btn btn-primary">🛍️ Continue Shopping</a>
+        </div>
+
+    </div>
+</section>
+
+{% endblock %}

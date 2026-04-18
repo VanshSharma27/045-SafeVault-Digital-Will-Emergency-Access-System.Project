@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Master - Quiz</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="page-wrapper">
+        <header class="site-header">
+            <div class="logo">🎯 Quiz Master</div>
+            <div class="timer-display" id="timer">
+                ⏱️ <span id="time-left">{{ '%02d:%02d' % (remaining // 60, remaining % 60) }}</span>
+            </div>
+        </header>
+
+        <main class="quiz-main">
+            <div class="quiz-progress-bar">
+                <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+            </div>
+            <div class="quiz-meta">
+                <span id="answered-count">0</span> / {{ questions|length }} answered
+            </div>
+
+            <form method="POST" action="/submit" id="quiz-form">
+                {% for q in questions %}
+                <div class="question-card" id="qcard-{{ loop.index }}">
+                    <div class="question-header">
+                        <span class="q-number">Q{{ loop.index }}</span>
+                        <span class="q-status" id="status-{{ q.id }}">⬜ Not answered</span>
+                    </div>
+                    <p class="question-text">{{ q.question }}</p>
+                    <div class="options-grid">
+                        {% for opt in q.options %}
+                        <label class="option-label" for="q{{ q.id }}_{{ loop.index }}">
+                            <input
+                                type="radio"
+                                name="q{{ q.id }}"
+                                id="q{{ q.id }}_{{ loop.index }}"
+                                value="{{ opt }}"
+                                onchange="markAnswered({{ q.id }}, {{ loop.index0 }})"
+                            >
+                            <span class="option-text">{{ opt }}</span>
+                        </label>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endfor %}
+
+                <div class="submit-section">
+                    <button type="button" class="btn-submit" onclick="confirmSubmit()">
+                        ✅ Submit Quiz
+                    </button>
+                </div>
+            </form>
+        </main>
+
+        <footer class="site-footer">
+            <p>Assignment 3 &mdash; Web Programming with Python and JavaScript Lab</p>
+        </footer>
+    </div>
+
+    <!-- Confirm Modal -->
+    <div class="modal-overlay" id="modal" style="display:none;">
+        <div class="modal-box">
+            <h2>Submit Quiz?</h2>
+            <p id="modal-msg">Are you sure you want to submit?</p>
+            <div class="modal-buttons">
+                <button class="btn-confirm" onclick="document.getElementById('quiz-form').submit()">Yes, Submit</button>
+                <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Timer
+        let remaining = {{ remaining }};
+        const totalTime = {{ timer_total }};
+        const timerEl = document.getElementById('time-left');
+        const timerDisplay = document.getElementById('timer');
+
+        function updateTimer() {
+            if (remaining <= 0) {
+                timerEl.textContent = "00:00";
+                alert("⏰ Time's up! Submitting your quiz...");
+                window.location.href = '/submit_timeout';
+                return;
+            }
+            remaining--;
+            const m = Math.floor(remaining / 60);
+            const s = remaining % 60;
+            timerEl.textContent = (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+            if (remaining <= 60) {
+                timerDisplay.classList.add('timer-urgent');
+            } else {
+                timerDisplay.classList.remove('timer-urgent');
+            }
+        }
+        setInterval(updateTimer, 1000);
+
+        // Track answered questions
+        const answered = new Set();
+        const totalQ = {{ questions|length }};
+
+        function markAnswered(qid, optIdx) {
+            answered.add(qid);
+            const statusEl = document.getElementById('status-' + qid);
+            if (statusEl) statusEl.textContent = '✅ Answered';
+            updateProgress();
+        }
+
+        function updateProgress() {
+            const pct = (answered.size / totalQ) * 100;
+            document.getElementById('progress-fill').style.width = pct + '%';
+            document.getElementById('answered-count').textContent = answered.size;
+        }
+
+        function confirmSubmit() {
+            const unanswered = totalQ - answered.size;
+            const msgEl = document.getElementById('modal-msg');
+            if (unanswered > 0) {
+                msgEl.textContent = `You have ${unanswered} unanswered question(s). Submit anyway?`;
+            } else {
+                msgEl.textContent = "All questions answered. Ready to submit!";
+            }
+            document.getElementById('modal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('modal').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
