@@ -1,4 +1,4 @@
-# 🛍️ ShopEasy — E-Commerce Website
+#  Shopsy — E-Commerce Website
 **Experiment-7 | Web Development with Django**
 **Author: Vansh Sharma | April 2026**
 
