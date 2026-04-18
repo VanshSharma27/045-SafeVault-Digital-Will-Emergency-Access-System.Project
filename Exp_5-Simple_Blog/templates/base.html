@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{% block title %}Simple Blog{% endblock %}</title>
+
+  <!-- Google Fonts: Playfair Display + DM Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+
+  <style>
+    /* ── CSS Reset & Variables ──────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink:      #1a1612;
+      --paper:    #f5f0e8;
+      --cream:    #ede7d8;
+      --rust:     #b84a2e;
+      --rust-lt:  #d4603f;
+      --muted:    #7a7060;
+      --border:   #cec4b0;
+      --shadow:   rgba(26,22,18,.12);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--paper);
+      color: var(--ink);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Masthead / Header ──────────────────────────────── */
+    header {
+      background: var(--ink);
+      color: var(--paper);
+      padding: 0 2rem;
+      border-bottom: 3px solid var(--rust);
+    }
+
+    .header-inner {
+      max-width: 900px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.4rem 0;
+      gap: 1rem;
+    }
+
+    .logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.7rem;
+      letter-spacing: .02em;
+      color: var(--paper);
+      text-decoration: none;
+    }
+
+    .logo span { color: var(--rust-lt); font-style: italic; }
+
+    nav { display: flex; gap: .5rem; }
+
+    nav a {
+      font-size: .85rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--cream);
+      text-decoration: none;
+      padding: .45rem .9rem;
+      border: 1px solid transparent;
+      border-radius: 3px;
+      transition: background .2s, border-color .2s, color .2s;
+    }
+
+    nav a:hover,
+    nav a.active {
+      background: var(--rust);
+      border-color: var(--rust);
+      color: #fff;
+    }
+
+    /* ── Main Content ───────────────────────────────────── */
+    main {
+      flex: 1;
+      max-width: 900px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 2.5rem 2rem;
+    }
+
+    /* ── Page heading ───────────────────────────────────── */
+    .page-heading {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      margin-bottom: 1.8rem;
+      padding-bottom: .8rem;
+      border-bottom: 2px solid var(--border);
+      color: var(--ink);
+    }
+
+    /* ── Flash / Error banner ───────────────────────────── */
+    .alert {
+      background: #fdf0ee;
+      border-left: 4px solid var(--rust);
+      color: var(--rust);
+      padding: .75rem 1rem;
+      border-radius: 0 4px 4px 0;
+      margin-bottom: 1.4rem;
+      font-size: .9rem;
+    }
+
+    /* ── Cards ──────────────────────────────────────────── */
+    .post-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 1.6rem 1.8rem;
+      margin-bottom: 1.4rem;
+      box-shadow: 0 2px 8px var(--shadow);
+      transition: transform .15s, box-shadow .15s;
+    }
+
+    .post-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px var(--shadow);
+    }
+
+    .post-card h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.35rem;
+      margin-bottom: .4rem;
+    }
+
+    .post-meta {
+      font-size: .78rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      margin-bottom: .85rem;
+    }
+
+    .post-content {
+      line-height: 1.75;
+      color: #3a342c;
+      font-size: .95rem;
+    }
+
+    .post-actions {
+      display: flex;
+      gap: .6rem;
+      margin-top: 1.2rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--cream);
+    }
+
+    /* ── Buttons ────────────────────────────────────────── */
+    .btn {
+      display: inline-block;
+      font-family: 'DM Sans', sans-serif;
+      font-size: .82rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      padding: .48rem 1.1rem;
+      border-radius: 3px;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background .2s, color .2s;
+    }
+
+    .btn-primary {
+      background: var(--rust);
+      color: #fff;
+    }
+    .btn-primary:hover { background: var(--rust-lt); }
+
+    .btn-secondary {
+      background: var(--cream);
+      color: var(--ink);
+      border: 1px solid var(--border);
+    }
+    .btn-secondary:hover { background: var(--border); }
+
+    .btn-danger {
+      background: transparent;
+      color: #b03a22;
+      border: 1px solid #e0b0a8;
+    }
+    .btn-danger:hover { background: #fdf0ee; }
+
+    /* ── Forms ──────────────────────────────────────────── */
+    .form-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 2rem 2.2rem;
+      box-shadow: 0 2px 8px var(--shadow);
+      max-width: 680px;
+    }
+
+    .form-group { margin-bottom: 1.4rem; }
+
+    label {
+      display: block;
+      font-size: .82rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      color: var(--muted);
+      margin-bottom: .5rem;
+    }
+
+    input[type="text"],
+    textarea {
+      width: 100%;
+      padding: .7rem .9rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: .95rem;
+      color: var(--ink);
+      background: var(--paper);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      outline: none;
+      transition: border-color .2s, box-shadow .2s;
+      resize: vertical;
+    }
+
+    input[type="text"]:focus,
+    textarea:focus {
+      border-color: var(--rust);
+      box-shadow: 0 0 0 3px rgba(184,74,46,.1);
+    }
+
+    textarea { min-height: 160px; }
+
+    .form-actions { display: flex; gap: .7rem; margin-top: 1.6rem; }
+
+    /* ── Empty state ────────────────────────────────────── */
+    .empty-state {
+      text-align: center;
+      padding: 4rem 2rem;
+      color: var(--muted);
+    }
+
+    .empty-state .empty-icon { font-size: 3rem; margin-bottom: 1rem; }
+    .empty-state p { margin-bottom: 1.5rem; line-height: 1.6; }
+
+    /* ── Footer ─────────────────────────────────────────── */
+    footer {
+      background: var(--ink);
+      color: var(--muted);
+      text-align: center;
+      padding: 1.1rem;
+      font-size: .8rem;
+      letter-spacing: .05em;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── Header / Navigation ─────────────────────────── -->
+  <header>
+    <div class="header-inner">
+      <a href="{{ url_for('index') }}" class="logo">The <span>Inkwell</span></a>
+      <nav>
+        <a href="{{ url_for('index') }}"
+           class="{% if request.endpoint == 'index' %}active{% endif %}">
+          Home
+        </a>
+        <a href="{{ url_for('create') }}"
+           class="{% if request.endpoint == 'create' %}active{% endif %}">
+          + New Post
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ── Page Content ────────────────────────────────── -->
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- ── Footer ──────────────────────────────────────── -->
+  <footer>
+    Simple Blog &mdash; Experiment-5 &mdash; Built with Flask
+  </footer>
+
+</body>
+</html>

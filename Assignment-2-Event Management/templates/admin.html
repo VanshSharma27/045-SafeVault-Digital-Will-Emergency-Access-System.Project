@@ -1,0 +1,97 @@
+<!-- ============================================================
+     Project Title : Event Management Website
+     File          : templates/admin.html  (Admin Panel)
+     ============================================================ -->
+{% extends "base.html" %}
+{% block title %}Admin Panel — EventHub{% endblock %}
+
+{% block content %}
+
+<section class="page-header">
+  <h1>🛠️ Admin Panel</h1>
+  <p>Manage all events — Add, Edit, Delete. &nbsp;
+    <a href="{{ url_for('admin_logout') }}" class="btn btn-sm btn-outline">Logout</a>
+  </p>
+</section>
+
+<!-- ── ADD EVENT FORM ── -->
+<section class="section">
+  <div class="admin-card">
+    <h2>➕ Add New Event</h2>
+    <form method="POST" action="{{ url_for('admin_add') }}" id="addEventForm">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Event Name *</label>
+          <input type="text" name="name" placeholder="e.g. Tech Summit 2025" required />
+        </div>
+        <div class="form-group">
+          <label>Category</label>
+          <input type="text" name="category" placeholder="Technology / Music / Workshop…" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Date *</label>
+          <input type="date" name="date" required />
+        </div>
+        <div class="form-group">
+          <label>Time *</label>
+          <input type="text" name="time" placeholder="e.g. 10:00 AM" required />
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Venue *</label>
+        <input type="text" name="venue" placeholder="City, Venue Name" required />
+      </div>
+      <div class="form-group">
+        <label>Description</label>
+        <textarea name="description" rows="3" placeholder="Short event description…"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Image URL</label>
+        <input type="url" name="image_url" placeholder="https://…" />
+      </div>
+      <button type="submit" class="btn btn-primary">Add Event</button>
+    </form>
+  </div>
+</section>
+
+<!-- ── EVENTS TABLE ── -->
+<section class="section">
+  <h2>📋 All Events ({{ events|length }})</h2>
+  {% if events %}
+  <div class="table-wrap">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>ID</th><th>Name</th><th>Date</th><th>Venue</th>
+          <th>Category</th><th>RSVPs</th><th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for event in events %}
+        <tr>
+          <td>{{ event['id'] }}</td>
+          <td><strong>{{ event['name'] }}</strong></td>
+          <td>{{ event['date'] }}</td>
+          <td>{{ event['venue'] }}</td>
+          <td><span class="event-badge">{{ event['category'] }}</span></td>
+          <td>{{ event['rsvp_count'] }}</td>
+          <td class="action-btns">
+            <a href="{{ url_for('admin_edit', event_id=event['id']) }}"
+               class="btn btn-sm btn-outline">✏️ Edit</a>
+            <a href="{{ url_for('admin_delete', event_id=event['id']) }}"
+               class="btn btn-sm btn-danger"
+               onclick="return confirm('Delete \'{{ event['name'] }}\'?')">🗑️ Delete</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+    <p class="empty-state">No events found. Add one above!</p>
+  {% endif %}
+</section>
+
+{% endblock %}

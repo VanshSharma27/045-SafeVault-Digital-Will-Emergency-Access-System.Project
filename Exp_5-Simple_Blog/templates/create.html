@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}Create Post — Simple Blog{% endblock %}
+
+{% block content %}
+
+  <h1 class="page-heading">Create New Post</h1>
+
+  <div class="form-card">
+
+    <!-- Show validation error if present -->
+    {% if error %}
+      <div class="alert">⚠ {{ error }}</div>
+    {% endif %}
+
+    <!--
+      POST to /create
+      Fields: title, content
+    -->
+    <form action="{{ url_for('create') }}" method="POST">
+
+      <div class="form-group">
+        <label for="title">Post Title</label>
+        <input
+          type="text"
+          id="title"
+          name="title"
+          placeholder="Enter a compelling title…"
+          value="{{ request.form.get('title', '') }}"
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="content">Content</label>
+        <textarea
+          id="content"
+          name="content"
+          placeholder="Write your post here…"
+          required
+        >{{ request.form.get('content', '') }}</textarea>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Publish Post</button>
+        <a href="{{ url_for('index') }}" class="btn btn-secondary">Cancel</a>
+      </div>
+
+    </form>
+  </div>
+
+{% endblock %}

@@ -1,0 +1,84 @@
+<!-- ============================================================
+     Project Title : Event Management Website
+     File          : templates/index.html  (Home / Landing Page)
+     ============================================================ -->
+{% extends "base.html" %}
+{% block title %}EventHub — Home{% endblock %}
+
+{% block content %}
+
+<!-- ── HERO SECTION ── -->
+<section class="hero">
+  <div class="hero-content">
+    <h1 class="hero-title">Discover &amp; Manage<br><span>Amazing Events</span></h1>
+    <p class="hero-subtitle">
+      Browse tech summits, music fests, workshops &amp; more.
+      Register in seconds and never miss an experience.
+    </p>
+    <div class="hero-buttons">
+      <a href="{{ url_for('events') }}"   class="btn btn-primary">Browse Events</a>
+      <a href="{{ url_for('register') }}" class="btn btn-outline">Register Now</a>
+    </div>
+  </div>
+  <div class="hero-visual">🎪</div>
+</section>
+
+<!-- ── STATS BAR ── -->
+<section class="stats-bar">
+  <div class="stat"><span class="stat-number">50+</span><span class="stat-label">Events</span></div>
+  <div class="stat"><span class="stat-number">10K+</span><span class="stat-label">Attendees</span></div>
+  <div class="stat"><span class="stat-number">20+</span><span class="stat-label">Cities</span></div>
+  <div class="stat"><span class="stat-number">100%</span><span class="stat-label">Free to Browse</span></div>
+</section>
+
+<!-- ── FEATURED EVENTS ── -->
+<section class="section">
+  <div class="section-header">
+    <h2>Featured Events</h2>
+    <a href="{{ url_for('events') }}" class="btn btn-sm btn-outline">View All →</a>
+  </div>
+  <div class="events-grid">
+    {% for event in events %}
+    <article class="event-card">
+      <figure class="event-img-wrap">
+        <img src="{{ event['image_url'] or 'https://via.placeholder.com/400x200?text=Event' }}"
+             alt="{{ event['name'] }}" loading="lazy" />
+        <span class="event-badge">{{ event['category'] }}</span>
+      </figure>
+      <div class="event-body">
+        <h3 class="event-name">{{ event['name'] }}</h3>
+        <p class="event-meta">📅 {{ event['date'] }} &nbsp;⏰ {{ event['time'] }}</p>
+        <p class="event-meta">📍 {{ event['venue'] }}</p>
+        <p class="event-desc">{{ event['description'][:100] }}…</p>
+        <div class="event-footer">
+          <span class="rsvp-count">👥 {{ event['rsvp_count'] }} RSVPs</span>
+          <a href="{{ url_for('register') }}?event={{ event['id'] }}" class="btn btn-primary btn-sm">Register</a>
+        </div>
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+</section>
+
+<!-- ── ABOUT SECTION ── -->
+<section class="about-section section">
+  <div class="about-text">
+    <h2>What is EventHub?</h2>
+    <p>
+      EventHub is a fully functional Event Management Portal built with
+      <strong>HTML5, CSS3, JavaScript</strong> and <strong>Python Flask</strong>.
+      It lets administrators create, edit and delete events while attendees can
+      browse, search, filter and register — all backed by an <strong>SQLite</strong> database.
+    </p>
+    <ul class="feature-list">
+      <li>✅ Dynamic Jinja2 templates</li>
+      <li>✅ Responsive CSS Grid layout</li>
+      <li>✅ Client-side JS validation</li>
+      <li>✅ Flask CRUD + session-based admin</li>
+      <li>✅ Live search &amp; category filter</li>
+      <li>✅ RSVP counter per event</li>
+    </ul>
+  </div>
+</section>
+
+{% endblock %}

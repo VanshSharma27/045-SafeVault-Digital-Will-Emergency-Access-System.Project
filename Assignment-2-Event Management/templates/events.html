@@ -1,0 +1,85 @@
+<!-- ============================================================
+     Project Title : Event Management Website
+     File          : templates/events.html  (Events Listing Page)
+     ============================================================ -->
+{% extends "base.html" %}
+{% block title %}All Events — EventHub{% endblock %}
+
+{% block content %}
+
+<section class="page-header">
+  <h1>All Events</h1>
+  <p>Explore upcoming events — search, filter, and register!</p>
+</section>
+
+<!-- ── SEARCH & FILTER BAR (Task 6 — Bonus) ── -->
+<section class="search-filter-bar section">
+  <form method="GET" action="{{ url_for('events') }}" class="search-form">
+    <input
+      type="text"
+      id="searchInput"
+      name="search"
+      placeholder="🔍 Search events by name, venue..."
+      value="{{ search }}"
+      class="search-input"
+    />
+    <select name="category" class="filter-select">
+      <option value="">All Categories</option>
+      {% for cat in categories %}
+        <option value="{{ cat['category'] }}"
+          {% if cat['category'] == selected_category %}selected{% endif %}>
+          {{ cat['category'] }}
+        </option>
+      {% endfor %}
+    </select>
+    <button type="submit" class="btn btn-primary">Filter</button>
+    <a href="{{ url_for('events') }}" class="btn btn-outline">Reset</a>
+  </form>
+</section>
+
+<!-- ── EVENTS GRID ── -->
+<section class="section">
+  {% if events %}
+    <p class="results-count">Showing <strong>{{ events|length }}</strong> event(s)</p>
+    <div class="events-grid" id="eventsGrid">
+      {% for event in events %}
+      <article class="event-card">
+        <figure class="event-img-wrap">
+          <img src="{{ event['image_url'] or 'https://via.placeholder.com/400x200?text=Event' }}"
+               alt="{{ event['name'] }}" loading="lazy" />
+          <span class="event-badge">{{ event['category'] }}</span>
+        </figure>
+        <div class="event-body">
+          <h3 class="event-name">{{ event['name'] }}</h3>
+          <p class="event-meta">📅 {{ event['date'] }} &nbsp;⏰ {{ event['time'] }}</p>
+          <p class="event-meta">📍 {{ event['venue'] }}</p>
+          <p class="event-desc">{{ event['description'] }}</p>
+          <div class="event-footer">
+            <span class="rsvp-count">👥 {{ event['rsvp_count'] }} RSVPs</span>
+            <a href="{{ url_for('register') }}?event={{ event['id'] }}" class="btn btn-primary btn-sm">Register</a>
+          </div>
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="empty-state">
+      <p>😔 No events found. <a href="{{ url_for('events') }}">Clear filters</a></p>
+    </div>
+  {% endif %}
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Live DOM search (no page reload) — Task 6
+  document.getElementById('searchInput').addEventListener('input', function () {
+    const query = this.value.toLowerCase();
+    document.querySelectorAll('.event-card').forEach(card => {
+      const text = card.innerText.toLowerCase();
+      card.style.display = text.includes(query) ? '' : 'none';
+    });
+  });
+</script>
+{% endblock %}

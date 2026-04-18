@@ -1,0 +1,156 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(to right, #fbc2eb, #a6c1ee);
+}
+
+header {
+    background: rgb(0, 2, 128) ;
+    color: white;
+    padding: 40px 20px;
+    text-align: center;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 38px;
+}
+
+header p {
+    font-size: 18px;
+    opacity: 0.9;
+}
+
+nav {
+    background-color: #ffffff;
+    padding: 12px;
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+nav a {
+    color: #0a89dd;
+    text-decoration: none;
+    margin: 0 15px;
+    font-weight: 600;
+}
+
+nav a:hover {
+    color: blueviolet;
+}
+
+section {
+    background-color: white;
+    max-width: 900px;
+    margin: 30px auto;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+}
+
+.welcome {
+    text-align: center;
+}
+
+.welcome h2 {
+    font-size: 28px;
+}
+
+button {
+    background: linear-gradient(to right, #1143cb, #2575fc);
+    color: white;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: 0.3s;
+}
+
+button:hover {
+    transform: scale(1.05);
+}
+
+.card {
+    background: #f9f9f9;
+    border-radius: 10px;
+    padding: 20px;
+    margin: 15px 0;
+    transition: 0.3s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+}
+
+ul li {
+    background: #eef3ff;
+    margin: 8px 0;
+    padding: 10px;
+    border-radius: 6px;
+    font-weight: 500;
+}
+
+form {
+    margin-top: 15px;
+}
+
+input, textarea {
+    width: 100%;
+    padding: 10px;
+    margin: 8px 0;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-family: 'Poppins', sans-serif;
+}
+
+input:focus, textarea:focus {
+    outline: none;
+    border-color: #1462e9;
+}
+
+#contact a {
+    display: inline-block;
+    margin: 10px 10px 0 0;
+    text-decoration: none;
+    font-weight: 600;
+    color: #2575fc;
+}
+
+#contact a:hover {
+    color: #1411cb;
+}
+
+footer {
+    background-color: #111;
+    color: white;
+    text-align: center;
+    padding: 15px;
+    margin-top: 40px;
+}
+#scrollBtn {
+    position: fixed;
+    bottom: 25px;
+    right: 25px;
+    display: none;
+    background: linear-gradient(to right, #6a11cb, #2575fc);
+    color: white;
+    border-radius: 50%;
+    border: none;
+    padding: 12px 16px;
+    font-size: 18px;
+    box-shadow: 0 8px 15px rgba(0,0,0,0.3);
+}

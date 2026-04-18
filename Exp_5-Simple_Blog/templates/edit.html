@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Post — Simple Blog{% endblock %}
+
+{% block content %}
+
+  <h1 class="page-heading">Edit Post</h1>
+
+  <div class="form-card">
+
+    <!-- Show validation error if present -->
+    {% if error %}
+      <div class="alert">⚠ {{ error }}</div>
+    {% endif %}
+
+    <!--
+      POST to /edit/<post_id>
+      Fields pre-filled with existing post data
+    -->
+    <form action="{{ url_for('edit', post_id=post.id) }}" method="POST">
+
+      <div class="form-group">
+        <label for="title">Post Title</label>
+        <input
+          type="text"
+          id="title"
+          name="title"
+          placeholder="Enter a compelling title…"
+          value="{{ request.form.get('title', post.title) }}"
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="content">Content</label>
+        <textarea
+          id="content"
+          name="content"
+          placeholder="Write your post here…"
+          required
+        >{{ request.form.get('content', post.content) }}</textarea>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+        <a href="{{ url_for('index') }}" class="btn btn-secondary">Cancel</a>
+      </div>
+
+    </form>
+  </div>
+
+{% endblock %}

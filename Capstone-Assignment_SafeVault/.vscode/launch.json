@@ -1,0 +1,16 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Launch SafeVault Server",
+      "skipFiles": ["<node_internals>/**"],
+      "program": "${workspaceFolder}/Server/server.js",
+      "envFile": "${workspaceFolder}/.env",
+      "restart": true,
+      "runtimeExecutable": "nodemon",
+      "console": "integratedTerminal"
+    }
+  ]
+}

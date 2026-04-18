@@ -1,0 +1,31 @@
+/* SafeVault Global Styles */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --void: #05050a;
+  --ink: #0a0a14;
+  --surface: #111120;
+  --lift: #181828;
+  --amber: #d4a017;
+  --amber-glow: #e8c04a;
+  --amber-dim: rgba(212,160,23,.12);
+  --amber-ring: rgba(212,160,23,.22);
+  --text: #f2edd8;
+  --muted: #6b6358;
+  --faint: #222238;
+  --red: #e05252;
+  --green: #4ecb7a;
+  --blue: #4a90e2;
+}
+
+html, body {
+  background: var(--void);
+  color: var(--text);
+  font-family: 'Manrope', sans-serif;
+}
+
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--lift); border-radius: 3px; }
+
+::selection { background: var(--amber-dim); color: var(--amber-glow); }
