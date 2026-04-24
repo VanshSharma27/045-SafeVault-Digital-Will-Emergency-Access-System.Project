@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+{% block title %}My ToDo List — Flask App{% endblock %}
+
+{% block content %}
+
+<!-- ══════════════════════════════════════
+     ADD TASK SECTION
+     ══════════════════════════════════════ -->
+<section class="add-todo-section">
+    <form action="{{ url_for('add') }}" method="POST" class="add-form">
+        <div class="form-group">
+            <input
+                type="text"
+                name="title"
+                placeholder="What needs to be done?"
+                class="todo-input"
+                required
+                autofocus
+            />
+        </div>
+        <div class="form-row">
+            <div class="form-group flex-1">
+                <input
+                    type="text"
+                    name="description"
+                    placeholder="Add a description (optional)"
+                    class="desc-input"
+                />
+            </div>
+            <div class="form-group">
+                <select name="priority" class="priority-select">
+                    <option value="low">🟢 Low</option>
+                    <option value="medium" selected>🟠 Medium</option>
+                    <option value="high">🔴 High</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Add Task
+            </button>
+        </div>
+    </form>
+</section>
+
+<!-- ══════════════════════════════════════
+     STATS BAR
+     ══════════════════════════════════════ -->
+<section class="stats-bar">
+    <div class="stat-item">
+        <span class="stat-number">{{ total }}</span>
+        <span class="stat-label">Total</span>
+    </div>
+    <div class="stat-item active">
+        <span class="stat-number">{{ active }}</span>
+        <span class="stat-label">Active</span>
+    </div>
+    <div class="stat-item done">
+        <span class="stat-number">{{ done }}</span>
+        <span class="stat-label">Done</span>
+    </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     FILTER TABS
+     ══════════════════════════════════════ -->
+<section class="filter-tabs">
+    <a href="{{ url_for('index', filter='all') }}"
+       class="tab {% if filter_by == 'all' %}active{% endif %}">
+        All
+    </a>
+    <a href="{{ url_for('index', filter='active') }}"
+       class="tab {% if filter_by == 'active' %}active{% endif %}">
+        Active
+    </a>
+    <a href="{{ url_for('index', filter='completed') }}"
+       class="tab {% if filter_by == 'completed' %}active{% endif %}">
+        Completed
+    </a>
+
+    {% if done > 0 %}
+    <a href="{{ url_for('clear_completed') }}"
+       class="tab tab-danger"
+       onclick="return confirm('Delete all completed tasks?')">
+        <i class="fas fa-trash"></i> Clear Completed
+    </a>
+    {% endif %}
+</section>
+
+<!-- ══════════════════════════════════════
+     TASK LIST
+     ══════════════════════════════════════ -->
+<section class="todo-list">
+    {% if todos %}
+        {% for todo in todos %}
+        <div class="todo-item {% if todo.completed %}completed{% endif %} priority-{{ todo.priority }}">
+
+            <div class="todo-left">
+                <!-- Toggle complete button -->
+                <a href="{{ url_for('toggle', todo_id=todo.id) }}"
+                   class="toggle-btn"
+                   title="{{ 'Mark as active' if todo.completed else 'Mark as done' }}">
+                    <i class="fas {% if todo.completed %}fa-check-circle{% else %}fa-circle{% endif %}"></i>
+                </a>
+
+                <div class="todo-content">
+                    <span class="todo-title">{{ todo.title }}</span>
+                    {% if todo.description %}
+                        <span class="todo-desc">{{ todo.description }}</span>
+                    {% endif %}
+                    <span class="todo-meta">
+                        <span class="badge priority-badge-{{ todo.priority }}">{{ todo.priority }}</span>
+                        <span class="todo-date">{{ todo.created_at.strftime('%b %d, %Y') }}</span>
+                    </span>
+                </div>
+            </div>
+
+            <div class="todo-actions">
+                <!-- Edit button — goes to edit.html -->
+                <a href="{{ url_for('edit', todo_id=todo.id) }}"
+                   class="action-btn edit-btn"
+                   title="Edit">
+                    <i class="fas fa-pen"></i>
+                </a>
+                <!-- Delete button -->
+                <a href="{{ url_for('delete', todo_id=todo.id) }}"
+                   class="action-btn delete-btn"
+                   title="Delete"
+                   onclick="return confirm('Delete this task?')">
+                    <i class="fas fa-trash"></i>
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+
+    {% else %}
+        <div class="empty-state">
+            <i class="fas fa-clipboard-list"></i>
+            <p>No tasks found. Add one above!</p>
+        </div>
+    {% endif %}
+</section>
+
+{% endblock %}

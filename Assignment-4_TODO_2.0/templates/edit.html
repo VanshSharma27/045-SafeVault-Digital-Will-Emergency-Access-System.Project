@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Edit Task — Flask ToDo{% endblock %}
+
+{% block content %}
+
+<!-- ══════════════════════════════════════
+     EDIT TASK PAGE
+     ══════════════════════════════════════ -->
+<section class="edit-section">
+    <div class="edit-card">
+        <h2><i class="fas fa-pen"></i> Edit Task</h2>
+
+        <form action="{{ url_for('edit', todo_id=todo.id) }}" method="POST">
+
+            <div class="form-group">
+                <label for="title">Task Title *</label>
+                <input
+                    type="text"
+                    id="title"
+                    name="title"
+                    value="{{ todo.title }}"
+                    class="todo-input"
+                    required
+                    autofocus
+                />
+            </div>
+
+            <div class="form-group">
+                <label for="description">Description</label>
+                <textarea
+                    id="description"
+                    name="description"
+                    class="desc-textarea"
+                    placeholder="Add a description (optional)"
+                    rows="3"
+                >{{ todo.description or '' }}</textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="priority">Priority</label>
+                <select id="priority" name="priority" class="priority-select">
+                    <option value="low"    {% if todo.priority == 'low'    %}selected{% endif %}>🟢 Low</option>
+                    <option value="medium" {% if todo.priority == 'medium' %}selected{% endif %}>🟠 Medium</option>
+                    <option value="high"   {% if todo.priority == 'high'   %}selected{% endif %}>🔴 High</option>
+                </select>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Save Changes
+                </button>
+                <a href="{{ url_for('index') }}" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> Cancel
+                </a>
+            </div>
+
+        </form>
+    </div>
+</section>
+
+{% endblock %}
