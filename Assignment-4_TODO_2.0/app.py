@@ -1,11 +1,4 @@
-# ============================================================
-# app.py — Flask-Powered Dynamic To-Do List Application
-# Assignment 4 | Web Programming with Python & JavaScript Lab (SEC035)
-# B.Tech Computer Science and Engineering | SOET
-# Student Name  : Aayush
-# Enrollment No.: 2401010042
-# Date          : April 2026
-# ============================================================
+
 
 from flask import Flask, render_template, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
