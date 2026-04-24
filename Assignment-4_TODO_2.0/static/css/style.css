@@ -1,12 +1,4 @@
-/* ============================================================
-   style.css — Flask To-Do Application
-   Assignment 4 | SEC035 | B.Tech CSE | SOET
-   Student Name  : Aayush
-   Enrollment No.: 2401010042
-   Date          : April 2026
-   ============================================================ */
 
-/* === SECTION 1 — CSS Variables & Reset === */
 :root {
     --primary:      #0d9488;
     --primary-dark: #0f766e;
